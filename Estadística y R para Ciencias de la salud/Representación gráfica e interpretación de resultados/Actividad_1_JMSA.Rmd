@@ -1,0 +1,499 @@
+---
+title: "Actividad_1"
+author: "José María Sevilla Avendaño"
+date: "`r Sys.Date()`"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+## 1. Ten en cuenta los siguientes genes: "AQ_ESR1", "AQ_HER2", "AQ_BRCA1", "AQ_BRCA2", "AQ_MKI67", "AQ_GATA3", "AQ_FOXA1", "AQ_CCND1", "AQ_CDH1", "AQ_TP53":
+### Para responder este ejercicio, apóyate en un diagrama de cajas en el que visualices por cada expresión de gen 2 cajas: 1 para trata y otro para tratB.
+
+```{r librerias, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(knitr.duplicate.label = "allow")
+
+if (!requireNamespace("ggplot2", quietly = TRUE))
+  install.packages("ggplot2")
+if (!requireNamespace("patchwork", quietly = TRUE))
+  install.packages("patchwork")
+if (!requireNamespace("pheatmap", quietly = TRUE))
+  install.packages("pheatmap")
+if (!requireNamespace("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+  BiocManager::install("ComplexHeatmap")
+if (!requireNamespace("dplyr", quietly = TRUE))
+  install.packages("dplyr")
+  
+library(ggplot2)
+library(patchwork)
+library(pheatmap)
+library(ComplexHeatmap)
+library(dplyr)
+  
+setwd("C:/Users/chema/Desktop/Master bioinformatica/Estadística y R para Ciencias de la Salud/mubio02_act1 (2)/")
+
+df <- read.csv("MUBioinfo_dataset_genes_oct2025.csv")
+
+```
+
+```{r genes, echo=FALSE, fig.height=15, fig.width=7}
+
+PA <- ggplot(df, aes(x = tratamiento, y = AQ_esr1, fill = tratamiento)) + 
+  geom_boxplot(outlier.color = "black", outlier.size = 1) + 
+  labs(title = "Expresión génica del gen AQ_ESR1", 
+       x = "Tratamiento", y="Expresión génica") +
+  
+  scale_y_continuous(breaks = c(0,0.5,1)) + 
+  theme_minimal() + 
+  theme(axis.title = element_text(size = 6,
+                                  color = "black",
+                                  face = "bold"),
+        title = element_text(size = 6,
+                             color = "black",
+                             face = "bold"),
+        legend.position = "none") +
+  scale_color_manual(values = c("pink", "blue")) + 
+  stat_boxplot(geom = "errorbar", width = 0.25) 
+
+PB <- ggplot(df, aes(x = tratamiento, y = AQ_her2, fill = tratamiento)) +
+  geom_boxplot(outlier.color = "black", outlier.size = 1) +
+  labs(title = "Expresión génica del gen AQ_HER2", x = "Tratamiento", y="Expresión génica") +
+  theme_minimal() +
+  scale_y_continuous(breaks = c(0,0.5,1)) +
+  theme(axis.title = element_text(size = 6,
+                                  color = "black",
+                                  face = "bold"),
+        title = element_text(size = 6,
+                             color = "black",
+                             face = "bold"),,
+        legend.position = "none") +
+  scale_color_manual(values = c("pink", "blue")) +
+  stat_boxplot(geom = "errorbar", width = 0.25)
+
+PC <- ggplot(df, aes(x = tratamiento, y = AQ_brca1, fill = tratamiento)) +
+  geom_boxplot(outlier.color = "black", outlier.size = 1) +
+  labs(title = "Expresión génica del gen AQ_BRCA1", x = "Tratamiento", y="Expresión génica") +
+  scale_y_continuous(breaks = c(0,0.5,1)) +
+  theme_minimal() +
+  theme(axis.title = element_text(size = 6,
+                                  color = "black",
+                                  face = "bold"),
+        title = element_text(size = 6,
+                             color = "black",
+                             face = "bold"),,
+        legend.position = "none") +
+  scale_color_manual(values = c("pink", "blue")) +
+  stat_boxplot(geom = "errorbar", width = 0.25)
+
+PD <- ggplot(df, aes(x = tratamiento, y = AQ_brca2, fill = tratamiento)) +
+  geom_boxplot(outlier.color = "black", outlier.size = 1) +
+  labs(title = "Expresión génica del gen AQ_BRCA2", x = "Tratamiento", y="Expresión génica") +
+  scale_y_continuous(breaks = c(0,0.5,1)) +
+  theme_minimal() +
+  theme(axis.title = element_text(size = 6,
+                                  color = "black",
+                                  face = "bold"),
+        title = element_text(size = 6,
+                             color = "black",
+                             face = "bold"),,
+        legend.position = "none") +
+  scale_color_manual(values = c("pink", "blue")) +
+  stat_boxplot(geom = "errorbar", width = 0.25)
+
+PE <- ggplot(df, aes(x = tratamiento, y = AQ_mki67, fill = tratamiento)) +
+  geom_boxplot(outlier.color = "black", outlier.size = 1) +
+  labs(title = "Expresión génica del gen AQ_MKI67", x = "Tratamiento", y="Expresión génica") +
+  scale_y_continuous(breaks = c(0,0.5,1)) +
+  theme_minimal() +
+  theme(axis.title = element_text(size = 6,
+                                  color = "black",
+                                  face = "bold"),
+        title = element_text(size = 6,
+                             color = "black",
+                             face = "bold"),,
+        legend.position = "none") +
+  scale_color_manual(values = c("pink", "blue")) +
+  stat_boxplot(geom = "errorbar", width = 0.25)
+
+PF <- ggplot(df, aes(x = tratamiento, y = AQ_gata3, fill = tratamiento)) +
+  geom_boxplot(outlier.color = "black", outlier.size = 1) +
+  labs(title = "Expresión génica del gen AQ_GATA3", x = "Tratamiento", y="Expresión génica") +
+  scale_y_continuous(breaks = c(0,0.5,1)) +
+  theme_minimal() +
+  theme(axis.title = element_text(size = 6,
+                                  color = "black",
+                                  face = "bold"),
+        title = element_text(size = 6,
+                             color = "black",
+                             face = "bold"),,
+        legend.position = "none") +
+  scale_color_manual(values = c("pink", "blue")) +
+  stat_boxplot(geom = "errorbar", width = 0.25)
+
+PG <- ggplot(df, aes(x = tratamiento, y = AQ_foxa1, fill = tratamiento)) +
+  geom_boxplot(outlier.color = "black", outlier.size = 1) +
+  labs(title = "Expresión génica del gen AQ_FOXA1", x = "Tratamiento", y="Expresión génica") +
+  scale_y_continuous(breaks = c(0,0.5,1)) +
+  theme_minimal() +
+  theme(axis.title = element_text(size = 6,
+                                  color = "black",
+                                  face = "bold"),
+        title = element_text(size = 6,
+                             color = "black",
+                             face = "bold"),,
+        legend.position = "none") +
+  scale_color_manual(values = c("pink", "blue")) +
+  stat_boxplot(geom = "errorbar", width = 0.25)
+
+PH <- ggplot(df, aes(x = tratamiento, y = AQ_ccnd1, fill = tratamiento)) +
+  geom_boxplot(outlier.color = "black", outlier.size = 1) +
+  labs(title = "Expresión génica del gen AQ_CCND1", x = "Tratamiento", y="Expresión génica") +
+  scale_y_continuous(breaks = c(0,0.5,1)) +
+  theme_minimal() +
+  theme(axis.title = element_text(size = 6,
+                                  color = "black",
+                                  face = "bold"),
+        title = element_text(size = 6,
+                             color = "black",
+                             face = "bold"),,
+        legend.position = "none") +
+  scale_color_manual(values = c("pink", "blue")) +
+  stat_boxplot(geom = "errorbar", width = 0.25)
+
+PI <- ggplot(df, aes(x = tratamiento, y = AQ_cdh1, fill = tratamiento)) +
+  geom_boxplot(outlier.color = "black", outlier.size = 1) +
+  labs(title = "Expresión génica del gen AQ_CDH1", x = "Tratamiento", y="Expresión génica") +
+  scale_y_continuous(breaks = c(0,0.5,1)) +
+  theme_minimal() +
+  theme(axis.title = element_text(size = 6,
+                                  color = "black",
+                                  face = "bold"),
+        title = element_text(size = 6,
+                             color = "black",
+                             face = "bold"),,
+        legend.position = "none") +
+  scale_color_manual(values = c("pink", "blue")) +
+  stat_boxplot(geom = "errorbar", width = 0.25)
+
+PJ <- ggplot(df, aes(x = tratamiento, y = AQ_tp53, fill = tratamiento)) +
+  geom_boxplot(outlier.color = "black", outlier.size = 1) +
+  labs(title = "Expresión génica del gen AQ_TP53", x = "Tratamiento", y="Expresión génica") +
+  scale_y_continuous(breaks = c(0,0.5,1)) +
+  theme_minimal() +
+  theme(axis.title = element_text(size = 6,
+                                  color = "black",
+                                  face = "bold"),
+        title = element_text(size = 6,
+                             color = "black",
+                             face = "bold"),,
+        legend.position = "none") +
+  scale_color_manual(values = c("pink", "blue")) +
+  stat_boxplot(geom = "errorbar", width = 0.25)
+
+PlotS <- PA + PB + PC + PD + PE + PF + PG + PH + PI + PJ + plot_layout(nrow =5, ncol=2)
+PlotS
+```
+
+### 1.1 ¿Qué interpretación sacas de la distribución de la expresión de los genes cuando los comparamos por tipo de tratamiento? 
+
+En los diferentes gráficos observamos que el fármaco disminuye la expresión de los genes problema mientras que el no-tratamiento del paciente o tratamiento con placebo no afecta a sus niveles de expresión génica, de esta forma se mantienen altos. En todos los casos tratados con fármaco podemos ver que la expresión génica está en un mínimo, sin apenas varianza, mientras que en los pacientes tratados con placebo podemos observar una varianza considerable en la expresión, la varianza del placebo se puede explicar por la diferencia de expresión génica entre diversos miembros de la población.
+Investigando un poco más podemos ver que la función de los genes problema se relacionan con las funciones de proliferación celular, diferenciación, transcripción, regulación del ciclo celular, etc...
+Podría decirse que las funciones están relacionadas principalmente con la proliferación celular, y que el fármaco puede tratarse de algún remedio experimental contra un cáncer, ya que a una parte de la población se le ha administrado placebo.
+
+## 2.	Ten en cuenta los siguientes parámetros bioquímicos para toda la población: "glucosa", "leucocitos", "linfocitos", "neutrofilos", "chol", "hdl", "hierro", "igA", "igE", "igG", "igN", "ldl", "pcr", "transferrina", "trigliceridos", "cpk":
+### Para responder este ejercicio, apóyate en un histograma en el que se visualice la frecuencia de cada variable, utilizando aproximadamente 30 bins.
+
+```{r Bioq, echo=FALSE, fig.height=4, fig.width=6}
+knitr::opts_chunk$set(echo = TRUE)
+options(knitr.duplicate.label = "allow")
+
+Glu <- ggplot(df, aes(glucosa)) + 
+  geom_histogram(aes(y=..density..), bins = 30, color = "black", fill = "lightgreen") + 
+  geom_vline(xintercept = c(70,100),
+             linetype = 1,
+             color = 2,
+             linewidth = 1)+
+  annotate("text", x=67, y=0.025, label="Límite bajo = 70 mg/dL", angle=90, size = 2.5)+
+  annotate("text", x=97, y=0.025, label="Límite alto = 100 mg/dL", angle=90, size = 2.5)+
+  labs(title = "Distribución poblacional de glucosa en sangre", x = "Glucosa (mg/dL)", y="Tendencia en la población") + 
+  theme_minimal() + 
+  geom_density(aes(glucosa), color = "blue", linewidth = 1)
+
+Glu
+
+Leu <- ggplot(df, aes(leucocitos)) +
+  geom_histogram(aes(y=..density..), bins = 30, color = "black", fill = "lightgreen") +
+  geom_vline(xintercept = c(4.5,11),
+             linetype = 1,
+             color = 2,
+             linewidth = 1) +
+  annotate("text", x=3.6, y=0.04, label="Límite bajo = 4.5*10^3 u/mm", angle=90, size = 2.5)+
+  annotate("text", x=10.5, y=0.19, label="Límite alto = 11*10^3 u/mm3", angle=90, size = 2.5)+
+  labs(title = "Distribución poblacional de leucocitos en sangre", x = "Leucocitos(u*10^3/mm3)", y="Tendencia en la población") +
+  theme_minimal() +
+  geom_density(aes(leucocitos),color = "blue", linewidth = 1)
+
+Leu
+
+Lin <- ggplot(df, aes(linfocitos)) +
+  geom_histogram(aes(y=..density..), bins = 30, color = "black", fill = "lightgreen") +
+  geom_vline(xintercept = c(1,4),
+             linetype = 1,
+             color = 2,
+             linewidth = 1) +
+  annotate("text", x=0.9, y=0.7, label="Límite bajo = 1*10^3 u/mm3", angle=90, size = 2.5)+
+  annotate("text", x=3.9, y=0.7, label="Límite alto = 4*10^3 u/mm3", angle=90, size = 2.5)+
+  labs(title = "Distribución poblacional de linfocitos en sangre", x = "Linfocitos(u*10^3/mm3)", y="Tendencia en la población") +
+  theme_minimal() +
+  geom_density(aes(linfocitos),color = "blue", linewidth = 1)
+
+Lin
+
+Neu <- ggplot(df, aes(neutrofilos)) +
+  geom_histogram(aes(y=..density..), bins = 30, color = "black", fill = "lightgreen") +
+  geom_vline(xintercept = c(2,7.5),
+             linetype = 1,
+             color = 2,
+             linewidth = 1) +
+  annotate("text", x=1.4, y=0.05, label="Límite bajo = 2*10^3 u/mm3", angle=90, size = 2.5)+
+  annotate("text", x=7.2, y=0.20, label="Límite alto = 7.5*10^3 u/mm3", angle=90, size = 2.5)+
+  labs(title = "Distribución poblacional de neutrofilos en sangre", x = "Neutrofilos (u*10^3/mm3)", y="Tendencia en la población") +
+  theme_minimal() +
+  geom_density(aes(neutrofilos),color = "blue", linewidth = 1)
+
+Neu
+
+Cho <- ggplot(df, aes(chol)) +
+  geom_histogram(aes(y=..density..), bins = 30, color = "black", fill = "lightgreen") +
+  geom_vline(xintercept = 200, #límite alto
+             linetype = 1,
+             color = 2,
+             linewidth = 1) +
+  annotate("text", x=195, y=0.015, label="Límite alto = 200 mg/dL", angle=90, size = 2.5)+
+  labs(title = "Distribución poblacional de colesterol en sangre", x = "colesterol (mg/dL)", y="Tendencia en la población") +
+  theme_minimal() +
+  geom_density(aes(chol),color = "blue", linewidth = 1)
+
+Cho
+
+Hd <- ggplot(df, aes(hdl)) +
+  geom_histogram(aes(y=..density..), bins = 30, color = "black", fill = "lightgreen") +
+  geom_vline(xintercept = 35, #límite bajo
+             linetype = 1,
+             color = 2,
+             linewidth = 1) +
+  annotate("text", x=33, y=0.03, label="Límite bajo = 35 mg/dL", angle=90, size = 2.5)+
+  labs(title = "Distribución poblacional de Hdl en sangre", x = "Hdl (mg/dL)", y="Tendencia en la población") +
+  theme_minimal() +
+  geom_density(aes(hdl),color = "blue", linewidth = 1)
+
+Hd
+
+Fe <- ggplot(df, aes(hierro)) +
+  geom_histogram(aes(y=..density..), bins = 30, color = "black", fill = "lightgreen") +
+  geom_vline(xintercept = c(37,145), 
+             linetype = 1,
+             color = 2,
+             linewidth = 1) +
+  annotate("text", x=34, y=0.020, label="Límite bajo = 37 ug/dL", angle=90, size = 2.5)+
+  annotate("text", x=142, y=0.020, label="Límite alto = 145 ug/dL", angle=90, size = 2.5)+
+  labs(title = "Distribución poblacional de hierro en sangre", x = "Hierro (ug/dL)", y="Tendencia en la población") +
+  theme_minimal() +
+  geom_density(aes(hierro),color = "blue", linewidth = 1)
+
+Fe
+
+ingA <- ggplot(df, aes(iga)) +
+  geom_histogram(aes(y=..density..), bins = 30, color = "black", fill = "lightgreen") +
+  geom_vline(xintercept = c(76,390), 
+             linetype = 1,
+             color = 2,
+             linewidth = 1) +
+  annotate("text", x=66, y=0.006, label="Límite bajo = 76 mg/dL", angle=90, size = 2.5)+
+  annotate("text", x=380, y=0.006, label="Límite alto = 390 mg/dL", angle=90, size = 2.5)+
+  labs(title = "Distribución poblacional de inmunoglobulina A en sangre", x = "igA (mg/dL)", y="Tendencia en la población") +
+  theme_minimal() +
+  geom_density(aes(iga),color = "blue", linewidth = 1)
+
+ingA
+
+ingE <- ggplot(df, aes(ige)) +
+  geom_histogram(aes(y=..density..), bins = 30, color = "black", fill = "lightgreen") +
+  geom_vline(xintercept = c(0,380), 
+             linetype = 1,
+             color = 2,
+             linewidth = 1) +
+  annotate("text", x=-10, y=0.01, label="Límite bajo = 0*10^3 u/mL", angle=90, size = 2.5)+
+  annotate("text", x=370, y=0.01, label="Límite alto = 380*10^3 u/mL", angle=90, size = 2.5)+
+  labs(title = "Distribución poblacional de inmunoglobulina E en sangre", x = "igE (U/dL)", y="Tendencia en la población") +
+  theme_minimal() +
+  geom_density(aes(ige),color = "blue", linewidth = 1)
+
+ingE
+
+ingG <- ggplot(df, aes(igg)) +
+  geom_histogram(aes(y=..density..), bins = 30, color = "black", fill = "lightgreen") +
+  geom_vline(xintercept = c(650,1500), 
+             linetype = 1,
+             color = 2,
+             linewidth = 1) +
+  annotate("text", x=620, y=0.0022, label="Límite bajo = 650 mg/dL", angle=90, size = 2.5)+
+  annotate("text", x=1470, y=0.0022, label="Límite alto = 1500 mg/dL", angle=90, size = 2.5)+
+  labs(title = "Distribución poblacional de inmunoglobulina G en sangre", x = "igG (mg/dL)", y="Tendencia en la población") +
+  theme_minimal() +
+  geom_density(aes(igg),color = "blue", linewidth = 1)
+
+ingG
+
+igM <- ggplot(df, aes(ign)) +
+  geom_histogram(aes(y=..density..), bins = 30, color = "black", fill = "lightgreen") +
+  geom_vline(xintercept = c(50,300), 
+             linetype = 1,
+             color = 2,
+             linewidth = 1) +
+  annotate("text", x=45, y=0.012, label="Límite bajo = 50 mg/dL", angle=90, size = 2.5)+
+  annotate("text", x=295, y=0.012, label="Límite alto = 300 mg/dL", angle=90, size = 2.5)+
+  labs(title = "Distribución poblacional de inmunoglobulina M en sangre", x = "igM (mg/dL)", y="Tendencia en la población") +
+  theme_minimal() +
+  geom_density(aes(ign),color = "blue", linewidth = 1)
+
+igM
+
+ld <- ggplot(df, aes(ldl)) +
+  geom_histogram(aes(y=..density..), bins = 30, color = "black", fill = "lightgreen") +
+  geom_vline(xintercept = 100, 
+             linetype = 1,
+             color = 2,
+             linewidth = 1) +
+  annotate("text", x=90, y=0.01, label="Límite alto = 100 mg/dL", angle=90, size = 2.5)+
+  labs(title = "Distribución poblacional de ldl en sangre", x = "Ldl (mg/dL)", y="Tendencia en la población") +
+  theme_minimal() +
+  geom_density(aes(ldl),color = "blue", linewidth = 1)
+
+ld
+
+Pc <- ggplot(df, aes(pcr)) +
+  geom_histogram(aes(y=..density..), bins = 30, color = "black", fill = "lightgreen") +
+  geom_vline(xintercept = 5, 
+             linetype = 1,
+             color = 2,
+             linewidth = 1) +
+  annotate("text", x=10, y=0.05, label="Límite alto = 5 mg/L", angle=90, size = 2.5)+
+  labs(title = "Distribución poblacional de proteína C reactiva en sangre", x = "PCR (mg/L)", y="Tendencia en la población") +
+  theme_minimal() +
+  geom_density(aes(pcr),color = "blue", linewidth = 1)
+
+Pc
+
+Tra <- ggplot(df, aes(transferrina)) +
+  geom_histogram(aes(y=..density..), bins = 30, color = "black", fill = "lightgreen") +
+  geom_vline(xintercept = c(200, 400),
+             linetype = 1,
+             color = 2,
+             linewidth = 1) +
+  annotate("text", x=195, y=0.01, label="Límite bajo = 200 mg/dL", angle=90, size = 2.5)+
+  annotate("text", x=395, y=0.01, label="Límite alto = 400 mg/dL", angle=90, size = 2.5)+
+  labs(title = "Distribución poblacional de transferrina en sangre", x = "Transferrina (mg/dL)", y="Tendencia en la población") +
+  theme_minimal() +
+  geom_density(aes(transferrina),color = "blue", linewidth = 1)
+
+Tra
+
+Trigl <- ggplot(df, aes(trigliceridos)) +
+  geom_histogram(aes(y=..density..), bins = 30, color = "black", fill = "lightgreen") +
+  geom_vline(xintercept = c(30, 200),
+             linetype = 1,
+             color = 2,
+             linewidth = 1) +
+  annotate("text", x=20, y=0.007, label="Límite bajo = 30 mg/dL", angle=90, size = 2.5)+
+  annotate("text", x=190, y=0.007, label="Límite alto = 200 mg/dL", angle=90, size = 2.5)+
+  labs(title = "Distribución poblacional de trigliceridos en sangre", x = "Trigliceridos (mg/dL)", y="Tendencia en la población") +
+  theme_minimal() +
+  geom_density(aes(trigliceridos),color = "blue", linewidth = 1)
+
+Trigl
+
+crea <- ggplot(df, aes(cpk)) +
+  geom_histogram(aes(y=..density..), bins = 30, color = "black", fill = "lightgreen") +
+  geom_vline(xintercept = c(30, 200),
+             linetype = 1,
+             color = 2,
+             linewidth = 1) +
+  annotate("text", x=27, y=0.013, label="Límite bajo = 30 U/L", angle=90, size = 2.5)+
+  annotate("text", x=195, y=0.013, label="Límite alto = 200 U/L", angle=90, size = 2.5)+
+  labs(title = "Distribución poblacional de creatinfosfoquinasa en sangre", x = "CPK (mg/dL)", y="Tendencia en la población") +
+  theme_minimal() +
+  geom_density(aes(cpk),color = "blue", linewidth = 1)
+
+crea
+```
+
+### 2.1 ¿Qué interpretación sacas de la distribución de los datos de las variables bioquímicas en toda la población? 
+
+Hay diferencias entre los distintos integrantes de la población, en el resultado de la glucosa podemos observar que sobre el 50% de la población o más tiene resultados que superan límites de glucosa en ayunas, lo cual daría lugar a enfermedades como diabetes en los pacientes que superasen por mucho el límite de 100 mg/dL.
+En la mayoría de parámetros bioquímicos podemos ver que la mayoría de la población tienen niveles que se encuentran entre los límites recomendados con algunas excepciones esperables. En el caso del colesterol Ldl encontramos un gran desajuste en la mayoría de la población, ya que la gran mayoría exceden el límite de 100 mg/dL, teniendo en cuenta otros parámetros una hipótesis puede ser que las medidas para el parametro de ldl sean erróneos.
+
+### 2.2 ¿Crees que sigue una distribución normal o simétrica en la que se visualiza una distribución parecida a una campana de Gauss? 
+
+En lineas generales, los parámetros bioquímicos dan lugar a una curva de gauss, en la que la mayoría de los pacientes tienen valores similares que suelen encontrarse entre los límites bajo y alto mientras que hay algunos integrantes que se pueden encontrar traspasando dichos límites, aunque suelen ser una excepción. 
+Por supuesto hay excepciones en algunos de los parámetros, un ejemplo de ello es la proteína C reactiva, en la que encontramos una mayoría de la población que tiene valores de proteína cercanos a cero, lo cual es esperable ya que su límite es muy bajo (5 mg/L) y va disminuyendo la cantidad de gente que tiene este valor bajo conforme vamos superando dicho límite, ya que lo esperable es tener una cantidad de proteína menor. 
+
+## 3.	Mapea todos los valores de expresión de genes para poder visualizar posibles patrones entre los datos de los pacientes:
+### Para responder esta pregunta, apóyate en un heatmap en el que visualices los datos crudos de todas las variables AQ (expresión de genes).
+
+```{r heatmap, echo=FALSE, fig.height=5, fig.width=8}
+knitr::opts_chunk$set(echo = TRUE)
+options(knitr.duplicate.label = "allow")
+
+setwd("C:/Users/chema/Desktop/Master bioinformatica/Estadística y R para Ciencias de la Salud/mubio02_act1 (2)/")
+
+df <- read.csv("MUBioinfo_dataset_genes_oct2025.csv")
+
+set.seed(1995)
+
+genes <- df %>% select(starts_with("AQ"))
+
+stangenes <- as.data.frame(scale(genes, center = TRUE, scale = TRUE))
+
+stangenes <- as.matrix(stangenes)
+
+stangenes <- t(stangenes)
+HM <- Heatmap(stangenes, 
+        row_km = 3, column_km = 8, 
+        col = circlize::colorRamp2(c(-2, 0, 2), c("blue", "white", "red")), 
+        column_title = "Pacientes", 
+        column_title_gp = grid::gpar(fontsize = 14),
+        row_title = "Genes", 
+        row_title_gp = grid::gpar(fontsize = 14),
+        name  = "Expresión génica",
+        column_gap = unit(1, "mm"),   
+        column_names_gp = grid::gpar(fontsize = 7),
+        row_gap = unit(2, "mm"),
+        row_names_gp = grid::gpar(fontsize = 7),
+        rect_gp = gpar(col = "white", lwd = 0.5),
+        border = TRUE)
+
+HM
+
+```
+
+### 3.1 ¿Hay algún tipo de patrón de pacientes que tiene la expresión de genes similar o diferenciada? ¿Hay grupos de genes con patrones de expresión similares o diferenciadas? 
+
+En el mapa de calor se pueden reconocer 3 patrones en cuanto a genes se refiere. La función mayoritaria de uno de los grupos de genes, el que contiene el gen TP53, es la proliferación celular. Aquí encontramos 2 grupos de pacientes, aquellos cuyos genes tienen una expresión génica alta y otros que tienen la expresión génica baja. Este grupo de genes se corresponde con los genes problema de la primera pregunta.
+
+Las funciones del segundo grupo de genes, el que contiene el gen b2m, están relacionadas con diferentes funciones, tales como la neurogénesis, la proliferación de células gliales, proliferación de células de tejido muscular liso, etc... Por lo que los pacientes con una alta expresión en estos genes pueden ser deportistas ya que el ejercicio físico estimula la neurogenesis.
+
+Las funciones del tercer grupo de genes, el que contiene el gen CASP3, están relacionadas con la apoptosis. Aquí encontramos algunos grupos de pacientes que tienen una gran expresión en dichos genes, quizás debido a un gran daño en el ADN.
+
+Podemos encontrar varios tipos de pacientes según su expresión génica:
+
+- Aquellos cuya expresión génica en las 3 agrupaciones de genes es mínima, en este grupo podríamos encontrar a paciente que no hacen ejercicio físico y no presentan dolencias relacionadas con la apoptosis.
+- Aquellos que tienen los genes de la proliferación celular sobreexpresados pero la expresión de los demás genes es mínima.
+- Aquellos que tienen sobreexpresados los genes relacionados con la neurogénesis y tejido muscular liso, pero ningún otro grupo de genes. Podrían considerarse deportistas sin ningún tipo de dolencia relacionada con la apoptosis.
+- Aquellos que solo tienen sobreexpresados los genes relacionados con la apoptosis, posiblemente con alguna dolencia relacionada con esta.
+- Aquellos con los grupos de genes de neurogénesis y proliferación celular.
+- Unos con los genes de la proliferación celular y la apoptosis sobreexpresados, aquí podrían encontrarse posibles pacientes de cáncer.
+- Un pequeño grupo con los genes de la neurogénesis y la apoptosis sobreexpresados.
+- Un pequeña proporción de pacientes con los todos los genes sobreexpresados.

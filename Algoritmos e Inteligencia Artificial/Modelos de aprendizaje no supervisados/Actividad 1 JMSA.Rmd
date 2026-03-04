@@ -1,0 +1,452 @@
+---
+title: "Algoritmos"
+author: "José María Sevilla Avendaño"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+# Actividad 1. Aplicación de técnicas de aprendizaje no supervisado sobre datos biológicos
+
+### El objetivo de esta actividad es determinar de forma justificada aquellos algoritmos de aprendizaje no supervisado más eficientes a la hora de detectar patrones en el conjunto de datos propuesto.
+
+### Para este trabajo se han usado los algoritmos T-sne, isomap, MDS y UMAP. Todos ellos usando 500 genes y 10000 genes como cantidades de trabajo.
+
+
+## 1.	Ambiente y librerías de trabajo (0,5 puntos):	¿Qué librerías han sido necesarias para llevar a cabo la implementación de cada uno de los métodos de aprendizaje no supervisado? Explica el rol de los argumentos de las funciones que has utilizado en cada método de reducción de dimensionalidad. 
+
+```{r Librerias, echo=FALSE, results="asis", tidy=FALSE}
+cat("Librerias de T-sne: [T-sne](#Librerías-de-T-sne) ", "\n")
+cat("Librerias de isomap: [isomap](#Librerías-de-isomap) ", "\n")
+cat("Librerias de MDS: [MDS](#Librerías-de-MDS) ", "\n")
+cat("Librerias de UMAP: [UMAP](#Librerías-de-UMAP) ", "\n")
+# Añadimos un apartado de hipervínculos a diferentes partes del documento para responder algunas preguntas.
+```
+
+
+## 2.	Procesamiento de los datos (1,5 puntos): ¿Qué problemas has detectado en el conjunto de datos que te han sido proporcionados? ¿Cómo los has solucionado?
+
+### Problemas encontrados en el dataset:
+
+1. No se puede trabajar con todo el dataset, el primer valor del archivo data.csv da error puesto que no se trata de una variable númerica.
+
+2. Trabajamos con una cantidad de valores muy alta, lo que puede hacer que el programa Rstudio deje de funcionar si el ordenador no es muy potente, o que requiera una gran cantidad de tiempo para poder meterlo en un data.frame. 
+
+3. Al trabajar con tantos valores, no todos los métodos de aprendizaje no supervisados funcionarían para reducir la dimensionalidad.
+
+### Soluciones
+
+1. Empezaremos a trabajar desde la segunda variable del data set escribiendo data <- sapply(data.raw[2:501]) en el caso de que queramos trabajar con 500 valores, pero siempre empezando con la segunda variable.
+
+2. Una solución puede ser seleccionar la cantidad de datos con la que vamos a trabajar en nuestro caso escribimos esto para trabajar con una cantidad de datos más pequeña: data <- sapply(data.raw[2:501]) 
+
+3. Tras mucha prueba y error, jugando con los valores de los vecinos y los genes seleccionados para trabajar, los algoritmos T-sne, isomap, MDS y UMAP nos permiten trabajar con un bajo (500) y un alto (10000) número de genes.
+
+
+## 3.	Métodos no supervisados (2,5 puntos): 
+
+## 3.1. ¿Cuál es el motivo por el cual has seleccionado estas técnicas de reducción de dimensionalidad? 
+
+Contamos con una gran cantidad de algoritmos para usar, todos tienen sus pros y sus contras, sin embargo, no todos son válidos para trabajar con ellos, en este caso se han probado varios de estos algoritmos con el dataset a analizar. Al final se ha podido confirmar que T-sne, isomap, MDS y UMAP son de los mejores algoritmos que se pueden usar, ya que, a pesar de modificar los datos como vecinos y genes, estos algoritmos proveen una separación clara entre los diferentes tipos de cancer. 
+
+Además de esto, cada uno de los algoritmos concede una reducción de la dimensionalidad diferente:
+
+- MDS usa una implementaciones tanto lineales como no lineales sobre los datos conservando su distancia euclidiana, además de una representación multidimensional de los datos lo que nos permite un mejor análisis y visualización. Representa los valores en un espacio de menor dimensión. 
+- T-sne: Para reducir la dimensionalidad, el método T-sne mide la probabilidad con la que 2 puntos cercanos sean vecinos cercanos en el espacio de menor dimensión gracias al método de descenso de gradiente. Usa una implementación no lineal mediante el descenso de gradiente. 
+- Isomap usa una implementación no lineal parecida a MDS pero conservando su distancia geodésica. El método isomap busca conservar la distancia entre los puntos en el espacio de mayor dimensión y en la de menor dimensión.
+- UMAP usa una implementación no lineal muy diferente, ya que se asume que las muestras están distribuidas en un espacio topológico, aunque es preferible que para la determinación de distancias mínimas, este espacio topológico se encuentre definido en un espacio euclidiano. Puede mapearse sobre un espacio de menor dimensión, para ello encuentra a los vecinos cercanos mediante el algoritmo de Nearest-Neighbor-Descent.
+
+Ademas para comprobar si estos métodos son útiles para este dataset hemos usado el método de clusterización k-means ver si los datos se agrupan bien, excepto en MDS.
+
+
+## 3.2. Las técnicas de reducción de dimensionalidad funcionan según el dataset que estemos usando, si tiene un número de datos muy alto, si tiene ¿Qué aspectos positivos y negativos tienen cada una de las técnicas escogidas? 
+
+### T-sne:
+
+Ventajas:
+
+- T-SNE captura muy bien las complejas relaciones polinómicas entre las características.
+- T-SNE preserva muy bien la localidad de los datos al mismo tiempo que revela parte de la importante estructura global de los datos en el mapeo de baja dimensionalidad.
+- En general es muy eficiente a la hora de identificar la estructura de los datos.
+
+Limitaciones:
+
+- Tiene cierto componente de azar, lo cual afecta a su reproducibilidad.
+- Computacionalmente costoso cuando se aplica en conjuntos de datos razonablemente grandes.
+
+### MDS: 
+
+Ventajas: 
+
+- No necesita de suposiciones previas sobre los datos, tales como la independencia de las muestras o la normalidad.
+
+Limitaciones:
+
+- Se trata de un método computacionalmente costoso.
+
+### Isomap
+
+Ventajas
+
+- Es un método muy eficaz para conjuntos de datos cuyas variables mantienen relaciones no lineales
+
+Limitaciones:
+
+- Encontrar el valor K correcto puede ser muy díficil, incluso si existe
+- El paso de determinar las distancias entre los puntos puede no funcionar con precisión si no existe una suficiente densidad de puntos en el espacio de alta dimensión.
+
+### UMAP
+
+Ventajas:
+
+- Muy util y versátil para la reducción de dimensionalidad.
+
+Limitaciones:
+
+- Dada la cantidad de parámetros que tiene se hace muy complicado ajustarlo para encontrar su máxima eficacia.
+
+
+## 3.3. Comenta para cada caso el resultado de representar gráficamente las primeras dos variables de cada uno de los métodos. ¿Qué se observa? ¿Tiene sentido biológico? Razona tu respuesta 
+
+```{r Observaciones, echo=FALSE, results="asis", tidy=FALSE}
+cat("Observaciones del método T-sne: [T-sne](#Observaciones-del-método-T-sne) ", "\n")
+cat("Observaciones del método isomap: [isomap](#Observaciones-del-método-isomap) ", "\n")
+cat("Observaciones del método MDS: [MDS](#Observaciones-del-método-MDS) ", "\n")
+cat("Observaciones del método UMAP: [UMAP](#Observaciones-del-método-UMAP) ", "\n")
+```
+
+```{r Librerias y directorio, include=FALSE}
+
+# Directorio en donde tendremos nuestros datos
+setwd("C:/Users/chema/Desktop/Master bioinformatica/Algoritmos e Inteligencia Artificial/Data")
+
+# Carga de librerias e instalación de librerias en caso de no tenerlas
+if (!requireNamespace("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+BiocManager::install("RDRToolbox")
+if (!requireNamespace("ggplot2", quietly = TRUE))
+  install.packages("ggplot2")
+if (!requireNamespace("Rtsne", quietly = TRUE))
+  install.packages("Rtsne")
+if (!requireNamespace("factoextra", quietly = TRUE))
+  install.packages("factoextra")
+if (!requireNamespace("plotly", quietly = TRUE))
+  install.packages("plotly")
+if (!requireNamespace("uwot", quietly = TRUE))
+  install.packages("uwot")
+
+# Cargamos las librerías
+library(RDRToolbox)
+library(ggplot2)
+library(Rtsne)
+library(factoextra)
+library(plotly)
+library(uwot)
+```
+
+## Algoritmo T-distributed Stochastic Neighbor Embedding (500 y 10000 genes)
+
+```{r T-sne 500, echo=FALSE}
+
+# T-distributed Stochastic Neighbor Embedding
+
+# Seteamos la semilla para que el algoritmo sea replicable
+set.seed(156)
+
+# Leemos el dataset con el que trabajamos y lo introducimos en una variable
+data.raw <- read.csv('data.csv')
+labels.raw <- read.csv('labels.csv')
+
+# Reducimos el número de variables a trabajar y lo introducimos en un data.frame
+data <- sapply(data.raw[2:501], as.numeric)
+
+# Algoritmo
+# funcion Rtsne()
+#   X: datos sobre los que reduciremos la dimensionalidad
+#   dims: tamaño final del conjunto de datos 
+#   num_threads: hilos a utilizar (procesadores).
+# No hace falta cambiar dims ni num_numthreads
+
+tsne <- Rtsne(X=data)
+#Variable Y con matriz del t-SNE
+tsne_result <- data.frame(tsne$Y)
+
+# Graficamos
+ggplot(tsne_result, aes(x = X1, y = X2, color = labels.raw$Class)) +
+  #establecemos los datos principales:
+    # data: el data.frame con el que trabajaremos (variable Y del t-SNE)
+    # x = Escogemos la variable x de la matriz (primera variable del método t-SNE, X1)
+    # y = Escogemos la variable y de la matriz (segunda variable del método t-SNE, X2)
+    # color = Le damos color a las variables (en este caso será en función de la variable Class del dataset labels.csv)
+geom_point(size = 3) +
+  # Tamaño de los puntos que se verán en la gráfica
+scale_color_manual(values = c("red", "blue", "green", "orange", "purple")) +
+  # Seteamos manualmente los colores
+labs(title = "Método t-SNE (500 genes)", x = "Dim 1", y = "Dim 2", color = "Tipos de cáncer") +
+  # Le damos nombre al gráfico, ejes x e y, y a la leyenda.
+theme_classic() +
+  # Le damos un aspecto suave.
+theme(panel.grid.major = element_line(color = "gray90"), panel.grid.minor = element_blank(),
+panel.background = element_rect(fill = "gray95"), plot.title=element_text(hjust=0.5))
+  # Añadimos el background detras de los puntos con colores suaves para que sea reconocible pero no nos impida ver el resto de la gráfica, además añadimos líneas y centramos el título
+
+kmeans.result <- kmeans(tsne_result, centers = 5, iter.max = 250, nstart = 50)
+# x = matriz númerica, en este caso usaremos la que obtenemos como resultado del
+# la función Rtsne (tsne_result)
+# centers = Número de clusters o agrupaciones
+# iter.max = número maximo de iteraciones permitidas
+# nstart = cuantos artículos al azar se escogen
+fviz_cluster(kmeans.result, tsne_result, xlab = 'Dim 1', ylab = 'Dim 2') +
+  #object = Objeto de clase lista, obtenido de la función kmeans (kmeans.result)
+  #data = matrix de datos usados para hacer el cluster
+  #xlab/ylab = nombres de los ejes x e y
+  ggtitle("Cluster plot de T-sne (500 genes)", subtitle = "") +
+  theme(plot.title = element_text(hjust = 0.5, margin = margin(b = -10)))
+```
+
+## Algoritmo T-distributed Stochastic Neighbor Embedding (10000 genes)
+
+```{r T-sne 10000, echo=FALSE}
+data <- sapply(data.raw[2:10001], as.numeric)
+
+tsne <- Rtsne(X=data)
+tsne_result <- data.frame(tsne$Y)
+
+ggplot(tsne_result, aes(x = X1, y = X2, color = labels.raw$Class)) +
+geom_point(size = 3) +
+scale_color_manual(values = c("red", "blue", "green", "orange", "purple")) +
+labs(title = "Método t-SNE (10000 genes)", x = "Dim 1", y = "Dim 2", color = "Tipos de cáncer") +
+theme_classic() +
+theme(panel.grid.major = element_line(color = "gray90"), panel.grid.minor = element_blank(),
+panel.background = element_rect(fill = "gray95"), plot.title=element_text(hjust=0.5))
+
+kmeans.result <- kmeans(tsne_result, centers = 5, iter.max = 250, nstart = 50)
+fviz_cluster(kmeans.result, tsne_result, xlab = 'Dim 1', ylab = 'Dim 2') +
+  ggtitle("Cluster plot de T-sne (10000 genes)", subtitle = "") +
+  theme(plot.title = element_text(hjust = 0.5, margin = margin(b = -10)))
+```
+
+### Librerías de T-sne {#Librerías-de-T-sne}
+
+Para este algoritmo hemos usado la libreria "ggplot2" para representar de forma gráfica el resultado del algoritmo, la "Rtsne" para poder implementar el método de aprendizaje no supervisado T-sne, y la librería "factoextra" para poder representar los diferentes tipos de cáncer que encontramos en la representación gráfica de ggplot divididos en diferenetes clusters con el método no jerarquico K-means para asegurarnos de que nuestros datos se han agrupado bien.
+
+### Observaciones del método T-sne {#Observaciones-del-método-T-sne}
+
+Tanto al analizar 500 genes como al analizar 10000 vemos que las agrupaciones se han separado correctamente. Aunque podemos encontrar algunos outliers, que se notan más en el análisis para 500 genes que para 10000. Esto tiene sentido ya que al añadir más datos con valores parecidos la heterogeneidad de las muestras se diluye, y de esta forma encontramos unas mejores agrupaciones. El sentido biológico que podemos encontrar aquí es que la mayoría de los genes que encontramos en una agrupación tienen que ver con el tipo de cancer que se está estudiando, pero es inevitable que unos pocos genes se puedan encontrar con expresiones alteradas en diversos tipos de cancer.
+
+## Algoritmo Isometric mapping (isomap) (500 genes)
+
+```{r isomap 500, echo=FALSE}
+
+# Guardado en un dataframe de los 500 primeros genes 
+data <- sapply(data.raw[2:501], as.numeric) 
+
+# Algoritmo
+
+# Funcion Isomap()
+#   data -> datos (matriz) sobre los que haremos reduccion de dimensionalidad
+#   dim -> dimensiones de las columnas del espacio reducido
+#   k -> numero de vecinos cercanos a cada punto. A mayor k mayor computacion
+#   potResiduals -> devuelve la varianza explicada por las diferentes dimensiones
+
+#   Si se ha elegido una unica dimension devuelve una matriz
+#   Si se ha elegido un vector de dimensiones devolvera una matriz por cada elemento del vector
+
+# Calculamos isomap de 1 a 10 dimensiones y con 15 vecinos, eliminamos la representación gráfica de la varianza explicada
+isomap.results = Isomap(data=data, dims=1:10, k=15, plotResiduals= FALSE)
+
+# Dataframe con los puntos que queremos dibujar en el plano 2D
+#     (elegiriamos otro si queremos otra dimension)
+isomap.df <- data.frame(isomap.results$dim2) 
+
+# Graficamos
+ggplot(isomap.df, aes(x = X1, y = X2, color = labels.raw$Class)) +
+  geom_point(size = 3) +
+  scale_color_manual(values = c("red", "blue", "green", "orange", "purple")) +
+  labs(title = "Método Isomap (500 genes)", x = 'Dim 1', y = 'Dim 2', color = "Tipos de cáncer") +
+  theme_classic() +
+  theme(panel.grid.major = element_line(color = "gray90"), panel.grid.minor = element_blank(),
+        panel.background = element_rect(fill = "gray95"), plot.title=element_text(hjust=0.5))
+
+kmeans.result <- kmeans(isomap.df, centers = 5, iter.max = 250, nstart = 50)
+fviz_cluster(kmeans.result, isomap.df, xlab = 'Dim 1', ylab = 'Dim 2') +
+  ggtitle("Cluster plot de isomap (500 genes)", subtitle = "") +
+  theme(plot.title = element_text(hjust = 0.5, margin = margin(b = -10))) 
+```
+
+## Algoritmo Isometric mapping (isomap) (10000 genes)
+
+```{r isomap 10000, echo=FALSE}
+data <- sapply(data.raw[2:10001], as.numeric)
+
+isomap.results = Isomap(data=data, dims=1:10, k=15, plotResiduals=FALSE)
+isomap.df <- data.frame(isomap.results$dim2) 
+isomap.plot <- ggplot(isomap.df, aes(x = X1, y = X2, color = labels.raw$Class)) +
+  geom_point(size = 3) +
+  scale_color_manual(values = c("red", "blue", "green", "orange", "purple")) +
+  labs(title = "Método Isomap (10000 genes)", x = 'Dim 1', y = 'Dim 2', color = "Tipos de cáncer") +
+  theme_classic() +
+  theme(panel.grid.major = element_line(color = "gray90"), panel.grid.minor = element_blank(),
+        panel.background = element_rect(fill = "gray95"), plot.title=element_text(hjust=0.5))
+
+
+isomap.plot
+
+kmeans.result <- kmeans(isomap.df, centers = 5, iter.max = 250, nstart = 50)
+fviz_cluster(kmeans.result, isomap.df, xlab = 'Dim 1', ylab = 'Dim 2') +
+  ggtitle("Cluster plot de isomap (10000 genes)", subtitle = "") +
+  theme(plot.title = element_text(hjust = 0.5, margin = margin(b = -10))) 
+
+
+```
+
+### Librerías de isomap {#Librerías-de-isomap}
+
+Para este algoritmo hemos usado la libreria "ggplot2" para representar de forma gráfica el resultado del algoritmo, la "RDRToolbox" para poder implementar el método de aprendizaje no supervisado isomap, y la librería "factoextra" para poder representar los diferentes tipos de cáncer que encontramos en la representación gráfica de ggplot divididos en diferenetes clusters con el método no jerarquico K-means para asegurarnos de que nuestros datos se han agrupado bien.
+
+### Observaciones del método isomap {#Observaciones-del-método-isomap}
+
+Isomap muestra una dispersión mayor entre los valores que el resto de métodos, sin embargo consigue una correcta separación de los valores, cosa que se confirma en la clusterización. Tanto aquí como en T-sne podemos encontrar outliers, lo que de nuevo confirma su sentido biológico de que se puedan encontrar algunos genes en otros tipos de cancer.
+
+## Algoritmo multidimensional scaling (mds) (500 genes)
+
+```{r MDS 500, echo=FALSE}
+
+#  multidimensional scaling (mds)
+
+# Metemos un data.frame del csv en una variable
+datos <- sapply(data.raw[2:501], as.numeric)
+
+# Calcular la matriz de distancias
+distancia <- dist(datos)
+
+# Aplicar MDS a 3 dimensiones
+mds_result <- cmdscale(distancia, k = 3)
+
+# Convertir el resultado a un data frame
+mds_df <- as.data.frame(mds_result)
+
+#Nombramos las dimensiones que vamos a usar
+colnames(mds_df) <- c("Dim1", "Dim2", "Dim3")
+
+# Añadir etiquetas de cáncer
+mds_df$Cancer_Type <- labels.raw$Class
+
+# Graficar en 3D
+fig <- plot_ly(mds_df, x = ~Dim1, y = ~Dim2, z = ~Dim3,
+               color = ~Cancer_Type, colors = "Set1", 
+               marker = list(size = 4))
+
+# Mostrar el gráfico
+fig
+```
+
+## Algoritmo multidimensional scaling (mds) (10000 genes)
+
+```{r MDS 10000, echo=FALSE}
+datos <- sapply(data.raw[2:10001], as.numeric)
+
+distancia <- dist(datos)
+
+mds_result <- cmdscale(distancia, k = 3)
+
+mds_df <- as.data.frame(mds_result)
+colnames(mds_df) <- c("Dim1", "Dim2", "Dim3")
+
+mds_df$Cancer_Type <- labels.raw$Class
+
+fig <- plot_ly(mds_df, x = ~Dim1, y = ~Dim2, z = ~Dim3, 
+               color = ~Cancer_Type, colors = "Set1", 
+               marker = list(size = 4))
+
+fig
+```
+
+### Librerías de MDS. {#Librerías-de-MDS}
+
+Para este algoritmo hemos usado la libreria "plotly" para poder representar el método de aprendizaje no supervisado mds en un espacio de 3 dimensiones, lo que nos permite estudiar con un mayor detalle la agrupación de los valores. En este caso no usamos el método de clusterización.
+
+### Observaciones del método MDS {#Observaciones-del-método-MDS}
+
+El método de aprendizaje no supervisado MDS no presenta la mejor separación entre los datos de todos los métodos que hemos visto, pero permite la posibilidad de poder cambiar de perspectiva para poder ver si esta separación consigue realizarse, y aunque varios outliers se lleguen agrupar en agrupaciones que no le corresponden, se puede diferenciar bien las agrupaciones, sobre todo cuando aumentamos el número de genes a analizar. De nuevo estos outliers pueden representar genes que se expresan alterados en varios tipos de cancer.
+
+## Algoritmo Uniform Manifold Approximation and Projection (UMAP) (500 y 10000 genes)
+
+```{r UMAP 500, echo=FALSE}
+
+# Uniform Manifold Approximation and Projection (UMAP)
+
+# Guardado en un dataframe de los 500 primeros genes 
+data <- sapply(data.raw[2:501], as.numeric)
+
+# Funcion umap()
+#     x: reduccion de la dimensionalidad
+#     n_neighbours: entero que indica el numero de vecinos cercanos
+#     n_componentes: entero que determina el tamaño del espacio de salida
+#     metric: define la distancia entre puntos
+#     min_dist: distancia minima permitida entre puntos
+#     local_conectivity: cuantos puntos están conectados "fuertemente"
+#     scale: tipos de escalado
+#     ret_model: para sacar los resultados del embedding
+#     verbose: tiempo hasta que se complete el calculo
+# Se dejan los parametros a excepcion del n_neighbours que lo iremos modificando
+
+
+umap.results <- umap(data, n_neighbors=0.2 * nrow(data),
+                     n_components = 2, min_dist = 0.1, local_connectivity=1, 
+                     ret_model = TRUE, verbose = TRUE)
+
+# Metemos en un data.frame el resultado de la operación umap
+umap.df <- data.frame(umap.results$embedding)
+
+# Calculamos las distancias y las metemos en una variable
+m_dist <- dist(umap.df)
+
+# Graficamos
+ggplot(umap.df, aes(x = X1, y = X2, color = labels.raw$Class)) +
+  geom_point(size = 3) +
+  scale_color_manual(values = c("red", "blue", "green", "orange", "purple")) +
+  labs(title = "Método UMAP (500 genes)", x = "X1", y = "X2", color = "Tipos de cáncer") +
+  theme_classic() +
+  theme(panel.grid.major = element_line(color = "gray90"), panel.grid.minor = element_blank(),
+        panel.background = element_rect(fill = "gray95"), plot.title=element_text(hjust=0.5))
+
+kmeans.result <- kmeans(umap.df, centers = 5, iter.max = 250, nstart = 50)
+fviz_cluster(kmeans.result, umap.df, xlab = 'Dim 1', ylab = 'Dim 2') +
+  ggtitle("Cluster plot de UMAP (500 genes)", subtitle = "") +
+  theme(plot.title = element_text(hjust = 0.5, margin = margin(b = -10))) 
+```
+
+## Algoritmo Uniform Manifold Approximation and Projection (UMAP) (10000 genes)
+
+``` {r UMAP 10000, echo=FALSE}
+data <- sapply(data.raw[2:10001], as.numeric)
+
+umap.results <- umap(data, n_neighbors=0.5 * nrow(data),
+                     n_components = 2, min_dist = 0.1, local_connectivity=1, 
+                     ret_model = TRUE, verbose = TRUE)
+
+umap.df <- data.frame(umap.results$embedding)
+
+m_dist <- dist(umap.df)
+
+ggplot(umap.df, aes(x = X1, y = X2, color = labels.raw$Class)) +
+  geom_point(size = 3) +
+  scale_color_manual(values = c("red", "blue", "green", "orange", "purple")) +
+  labs(title = "Método UMAP (10000 genes)", x = "X1", y = "X2", color = "Tipos de cáncer") +
+  theme_classic() +
+  theme(panel.grid.major = element_line(color = "gray90"), panel.grid.minor = element_blank(),
+        panel.background = element_rect(fill = "gray95"), plot.title=element_text(hjust=0.5))
+
+kmeans.result <- kmeans(umap.df, centers = 5, iter.max = 250, nstart = 50)
+fviz_cluster(kmeans.result, umap.df, xlab = 'Dim 1', ylab = 'Dim 2') +
+  ggtitle("Cluster plot de UMAP, (10000 genes)", subtitle = "") +
+  theme(plot.title = element_text(hjust = 0.5, margin = margin(b = -10))) 
+```
+
+### Librerías de UMAP {#Librerías-de-UMAP}
+
+Para este algoritmo hemos usado la libreria "ggplot2" para representar de forma gráfica el resultado del algoritmo, la "uwot" para poder implementar el método de aprendizaje no supervisado UMAP, y la librería "factoextra" para poder representar los diferentes tipos de cáncer que encontramos en la representación gráfica de ggplot divididos en diferenetes clusters con el método no jerarquico K-means para asegurarnos de que nuestros datos se han agrupado bien.
+
+### Observaciones del método UMAP {#Observaciones-del-método-UMAP}
+
+El método UMAP posiblemente sea el mejor ejemplo de agrupación entre los distintos genes en los diferentes agrupaciones de tipos de cáncer, y sin embargo, es posible ver algunos outliers en algunas de estas agrupaciones. Al igual que otros métodos, estos outliers se ven reducidos cuando analizamos un número mayor de genes. Y al igual que en otros métodos, la explicación de estos outliers también puede deberse a la expresión génica alterada de algunos genes en diferentes tipos de cáncer, y siendo éste el cuarto método que presenta estos outliers la teoría cobra más fuerza.

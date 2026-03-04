@@ -1,0 +1,391 @@
+---
+title: "Actividad 3 Estadística y R para Ciencias de la Salud"
+author: "Grupo 10"
+date: "2026-01-22"
+output: html_document
+---
+
+## Proyecto Transversal en R: Análisis de Bioestadística Aplicada a la Expresión Génica en Los Simpsons
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Cargar librerías:
+
+```{r, warning=FALSE, message=FALSE}
+library(readr)
+library(tidyverse)
+library(tibble)
+library(ggplot2) # graficos
+library(factoextra)
+library(pheatmap)
+library(gtsummary)
+library(broom)
+library(nnet)
+library(performance)
+library(pROC)
+library(stats)
+library(gt)
+```
+
+### Importar y Limpiar datos:
+
+```{r importar_datos, warning=FALSE, message=FALSE}
+setwd("C:/Users/chema/Desktop/Master bioinformatica/Estadística y R para Ciencias de la Salud/Actividad 3 grupal/mubio02_act3/")
+df <- read_csv("Base de datos Los Simpson completa.csv")
+glimpse(df)
+
+genes_df <- df %>% select(ADCY3:UHMK1)
+colSums(is.na(genes_df))
+
+df_clean <- df %>% filter(complete.cases(select(., ADCY3:UHMK1)))
+any(is.na(df_clean %>% select(ADCY3:UHMK1)))
+```
+
+Tras la comprobación de si hay valores nulos en la base de datos, al no ver que hay, se decide continuar con la base de datos original para hacer los análisis estadísticos.
+
+### Normalidad:
+
+```{r normalidad, warning=FALSE, message=FALSE}
+# Seleccionar genes AQ
+genes_df <- df %>% select(ADCY3:UHMK1)
+col_names <- names(genes_df)
+
+# Función para test de normalidad
+test_normalidad <- function(x) {
+  x <- x[!is.na(x)]
+  if (length(x) > 50) {
+    p <- ks.test(x, "pnorm", mean = mean(x), sd = sd(x))$p.value
+    test <- "Kolmogorov-Smirnov"
+  } else {
+    p <- shapiro.test(x)$p.value
+    test <- "Shapiro-Wilk"
+  }
+  
+  list(test = test, p = p)
+}
+
+resultados <- lapply(genes_df, test_normalidad)
+
+# Construir tabla base
+tabla_modelo1 <- data.frame(
+  Variable = col_names,
+  Test_utilizado = sapply(resultados, function(x) x$test),
+  Valor_p = sapply(resultados, function(x) x$p),
+  Interpretacion = ifelse(
+    sapply(resultados, function(x) x$p) >= 0.05,
+    "Compatible con normalidad",
+    "No normal"
+  ),
+  row.names = NULL
+)
+
+# Crear Tabla Modelo 1
+tabla_modelo1 %>%
+  gt() %>%
+  cols_label(
+    Variable        = md("**Variable**"),
+    Test_utilizado  = md("**Test utilizado**"),
+    Valor_p         = md("**Valor p**"),
+    Interpretacion  = md("**Interpretación**")
+  ) %>%
+  tab_header(
+    title = md("**Tabla 1: Análisis de normalidad de los genes AQ**")
+  ) %>%
+  fmt(
+    columns = Valor_p,
+    fns = function(x) {
+      ifelse(
+        is.na(x),
+        NA,
+        ifelse(
+          x < 0.001,
+          "< 0.001",
+          formatC(x, format = "f", digits = 3)
+        )
+      )
+    }
+  ) %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(columns = Variable)
+  ) %>%
+  cols_align(
+    align = "center",
+    columns = c(Test_utilizado, Valor_p, Interpretacion)
+  ) %>%
+  cols_align(
+    align = "left",
+    columns = Variable
+  ) %>%
+  tab_source_note(
+    source_note =
+      "La hipótesis nula del contraste de normalidad indica que los datos siguen una distribución normal. Se considera evidencia contra la normalidad cuando p < 0.05."
+  )
+```
+
+Primero se ha realizado un test de normalidad para las variables de los genes. Para realizar un test de normalidad es imprescible elegir bien cual se va usar, puesto que el test de Shapiro-Wilk sólo se puede usar cuando el tamaño muestral es menor de 50. Por lo tanto, se ha realizado un bucle que seleccionará el test de normalidad a realizar dependiento del tamaño muestral. Si N < 50 entonces se realizará el test de Shapiro-Wilk, y si N > 50 se realizará el test de Kolmogorov-Smirnov. Se ha elegido el test de Kolmogorov-Smirnoff como alternativa al Shapiro-Wilk, puesto que es un test muy restrictivo. Tal y como se puede apreciar en la Tabla 1, todos los genes no siguen una distribución normal, excepto PCSK1 que tiene un p-valor de 0.073. Al tener un p-valor cercano al 0.05 consideremos que este gen aunque sea compatible con una distribución normal, no sigue la normalidad puesto que el test utilizado ha sido el de Kolmogorov-Smirnov es muy restrictivo. Por lo tanto, para realizar los siguientes análisis descriptivos de los genes, habrá que utilizar métodos no paramétricos.
+
+### Análisis de Componentes Principales (PCA):
+
+```{r PCA, warning=FALSE, message=FALSE}
+pca <- prcomp(genes_df, center = TRUE, scale. = TRUE)
+var_exp <- summary(pca)$importance["Proportion of Variance", ]
+tabla_r2 <- data.frame(
+  Componente = names(var_exp),
+  R2 = round(as.numeric(var_exp), 3)
+)
+
+tabla_r2 %>%
+  gt() %>%
+  tab_header(
+    title = md("**Tabla 2. Varianza explicada por las componentes principales**")
+  ) %>%
+  cols_label(
+    Componente = "Componente",
+    R2 = "R²"
+  )
+
+# Scores
+scores <- as.data.frame(pca$x[, 1:6])
+df <- bind_cols(df, scores)
+
+tabla_pca <- as.data.frame(pca$rotation[, 1:2])
+tabla_pca <- tabla_pca %>%
+  tibble::rownames_to_column(var = "Variable")
+tabla_pca <- tabla_pca %>%
+  mutate(
+    `Componente 1` = round(PC1, 3),
+    `Componente 2` = round(PC2, 3)
+  ) %>%
+  select(Variable, `Componente 1`, `Componente 2`)
+
+tabla_pca %>%
+  gt() %>%
+  tab_header(
+    title = md("**Tabla 3. Cargas de las variables en las componentes principales**")
+  ) %>%
+  cols_label(
+    Variable = "Variable",
+    `Componente 1` = "Componente 1",
+    `Componente 2` = "Componente 2"
+  )
+```
+
+La Tabla 2 muestra la proporción de varianza explicada por cada componente principal, observándose que las primeras componentes concentran la mayor parte de la variabilidad del conjunto de datos.
+
+La Tabla 3 muestra las cargas de las variables en los dos primeras componentes principales, indicando la contribución de cada variable a la construcción de dichos componentes.
+
+### Visualización y Clustering:
+
+```{r clustering, warning=FALSE, message=FALSE}
+# Categoría IMC
+df <- df %>%
+  mutate(
+    imc_cat = case_when(
+      imc_kg_m2 < 25 ~ "Normal",
+      imc_kg_m2 < 30 ~ "Sobrepeso",
+      TRUE ~ "Obesidad"
+    )
+  )
+
+fviz_eig(pca) ## Scree plot
+fviz_pca_var(pca, col.var = "cos2") ## Circulo de correlaciones cos2
+
+fviz_pca_ind(
+  pca,
+  geom = "point",
+  habillage = df$imc_cat, 
+  addEllipses = TRUE,
+  ellipse.type = "norm",
+  palette = c("blue", "yellow", "orange")
+) +
+  theme_classic()
+# Clustering
+fviz_pca_var(pca, cluster = TRUE, k = 3)
+```
+
+El scree plot y la tabla 2 muestra que el PC1 explica alrededor del 12,5% de la varianza total, el PC2 explica alrededor del 8.6% y el PC3 alrededor del 6.5%. A partir del PC4 la pendiente se aplana claramente. Esto sugiere que las primeras 2–3 componentes principales concentran la mayor parte de la información relevante. Por medio del criterio del codo, se escogerian como mucho los cuatro primeros componentes, pero como en el enunciado se dice que es escojan los seis primeros componentes es lo que se selecciona. 
+
+En cuanto al gráfico es el círculo de correlaciones del PCA (variables-PCA), las variables que muestren mayor cos² se consideran las mejor representadas en el plano formado por los dos primeros componentes principales. Por lo tanto, el primer componente principal está principalmente definido por los genes LEPR, ADCY3 y MC4R, mientras que el segundo componente está asociado con los genes NTRK2 y CADM2.
+
+La representación de los individuos en el plano definido por las dos primeras componentes principales (PC1 y PC2) muestra un solapamiento considerable entre las distintas categorías de IMC. No se observa una separación clara entre normopeso, sobrepeso y obesidad, aunque los individuos con obesidad presentan una ligera tendencia a valores más elevados en PC1. La dispersión observada indica que estas componentes principales no discriminan de forma robusta el estado ponderal. Estos resultados son coherentes con el carácter exploratorio del análisis y sugieren que las diferencias clínicas no quedan plenamente capturadas por las dos primeras componentes.
+
+### Heatmap:
+
+```{r heatmap, warning=FALSE, message=FALSE}
+cors <- cor(genes_df, scores, method="spearman")
+
+pheatmap(cors, main="Correlación Spearman genes–PCAs")
+```
+
+El heatmap de expresión génica muestra que cada componente principal está influida por un conjunto específico de genes con valores elevados. En PC1 destaca POMC, mientras que PC2 está caracterizada por CADM2 y NTRK2. En PC3 predominan CREBRF, FTO y PHIP, y en PC4 y PC5 sobresalen MC4R y DPP9. Finalmente, GIPR presenta una mayor contribución en PC6, lo que refuerza la coherencia biológica de las componentes principales obtenidas.
+El análisis funcional con GeneCodis indica que los genes con mayor peso en el heatmap y el PCA se asocian principalmente a procesos de metabolismo energético y regulación del tejido adiposo. Destacan términos relacionados con la generación de energía y la proliferación del tejido adiposo blanco, en los que participan genes como POMC, FTO y GIPR. Estos resultados respaldan la interpretación biológica de los componentes principales obtenidos.
+
+### Tabla descriptiva por terciles
+
+```{r terciles, warning=FALSE, message=FALSE}
+make_terciles <- function(x) {
+  q <- quantile(x, probs = c(1/3, 2/3), na.rm = TRUE)
+  cut(
+    x,
+    breaks = c(-Inf, q, Inf),
+    labels = c("T1", "T2", "T3"),
+    include.lowest = TRUE
+  )
+}
+
+df <- df %>%
+  mutate(
+    PC1_t = make_terciles(PC1),
+    PC2_t = make_terciles(PC2),
+    PC3_t = make_terciles(PC3)
+  )
+
+genes_df <- colnames(df %>% select(ADCY3:UHMK1))
+
+tabla_pc1 <- df %>%
+  select(PC1_t, all_of(genes_df)) %>%
+  tbl_summary(
+    by = PC1_t,
+    type = all_of(genes_df) ~ "continuous",
+    statistic = all_of(genes_df) ~ "{median} ({p25}–{p75})",
+    digits = all_of(genes_df) ~ 1,
+    missing = "no"
+  ) %>%
+  add_p(
+    test = all_of(genes_df) ~ "kruskal.test",
+    pvalue_fun = ~ style_pvalue(.x, digits = 3)
+  )
+
+tabla_pc2 <- df %>%
+  select(PC2_t, all_of(genes_df)) %>%
+  tbl_summary(
+    by = PC2_t,
+    type = all_of(genes_df) ~ "continuous",
+    statistic = all_of(genes_df) ~ "{median} ({p25}–{p75})",
+    digits = all_of(genes_df) ~ 1,
+    missing = "no"
+  ) %>%
+  add_p(
+    test = all_of(genes_df) ~ "kruskal.test",
+    pvalue_fun = ~ style_pvalue(.x, digits = 3)
+  )
+
+tabla_modelo_terciles <- tbl_merge(
+  tbls = list(tabla_pc1, tabla_pc2),
+  tab_spanner = c("**Componente 1**", "**Componente 2**")
+) %>%
+  modify_caption(
+    "**Tabla 4. Estadísticos descriptivos de la expresión génica por terciles de las componentes principales**"
+  ) %>%
+  bold_labels()
+
+tabla_modelo_terciles
+```
+
+La Tabla 4 muestra los estadísticos descriptivos de la expresión génica según los terciles de los dos primeros componentes principales. Para el primer componente, varios genes como ADCY3, ANKRD27, CADM1, POMC, TMEM18, MC4R y POMC, entre otros mostraron diferencias significativas entre terciles. Por otro lado, en el segundo componente se aprecian diferencias significativas en la expresión de genes como CADM2, FTO, KS2, NTRK2, NTRK2, PHIP y LEP, entre otros. Estos resultados concuerdan con lo visto en el gráfico del círculo de correlaciones del PCA. De hecho, los genes ADCY3, MC4R y POMC están relacionados con la regulación del balance energético y la señalización leptínica, mientras que los genes CADM2, NTRK2 y LEP están implicados en la regulación neuronal.
+
+
+### Modelo de regresión logística
+
+```{r logistica, message=FALSE, warning=FALSE}
+
+# 1. Variables
+df <- df %>%
+  mutate(
+    obesidad = ifelse(imc_cat == "Obesidad", 1, 0),
+    obesidad = factor(obesidad, levels = c(0, 1), labels = c("No", "Sí")),
+    sexo = factor(sexo, levels = c("Femenino", "Masculino")),
+    PC1_t = factor(PC1_t, levels = c("T1", "T2", "T3"))
+  )
+
+# 2. Modelo
+ modelo_bin <- glm(
+  obesidad ~ PC1_t + PC2_t + PC3_t + edad_anios + sexo,
+  data = df,
+  family = binomial
+)
+
+# 3. Resultados del modelo
+res_bin <- tidy(
+  modelo_bin,
+  exponentiate = TRUE,
+  conf.int = TRUE
+)
+
+# 4. Función segura para extraer coeficientes
+get_coef <- function(res, term_name) {
+  tmp <- res %>% filter(term == term_name)
+  if (nrow(tmp) != 1) {
+    stop(paste("El término", term_name, "no es único en el modelo"))
+  }
+  list(
+    or = round(tmp$estimate, 2),
+    lo = round(tmp$conf.low, 2),
+    hi = round(tmp$conf.high, 2),
+    p  = round(tmp$p.value, 3)
+  )
+}
+
+# 5. Extraer coeficientes
+pc1_t2 <- get_coef(res_bin, "PC1_tT2")
+pc1_t3 <- get_coef(res_bin, "PC1_tT3")
+edad_r <- get_coef(res_bin, "edad_anios")
+sexo_r <- get_coef(res_bin, "sexoMasculino")
+
+# 6. Formato OR
+fmt_or <- function(x) {
+  paste0(x$or, " (", x$lo, "–", x$hi, ")")
+}
+
+# 7. Tabla final
+tabla_binaria <- tibble(
+  Variable = c(
+    "Terciles componente 1",
+    "Edad (años)",
+    "Sexo (Masculino vs Femenino)"
+  ),
+  T1_OR = c("1 (Ref.)", "—", "—"),
+  T1_p  = c("NA", "NA", "NA"),
+  T2_OR = c(fmt_or(pc1_t2), fmt_or(edad_r), fmt_or(sexo_r)),
+  T2_p  = c(pc1_t2$p, edad_r$p, sexo_r$p),
+  T3_OR = c(fmt_or(pc1_t3), fmt_or(edad_r), fmt_or(sexo_r)),
+  T3_p  = c(pc1_t3$p, edad_r$p, sexo_r$p)
+)
+
+tabla_binaria %>%
+  gt() %>%
+  tab_header(
+    title = md("**Tabla 5. Asociación entre terciles del PCA y obesidad**"),
+    subtitle = md("Modelo de regresión logística binaria")
+  ) %>%
+  cols_label(
+    T1_OR = "OR (IC 95%)",
+    T1_p  = "p-value",
+    T2_OR = "OR (IC 95%)",
+    T2_p  = "p-value",
+    T3_OR = "OR (IC 95%)",
+    T3_p  = "p-value"
+  ) %>%
+  tab_spanner(
+    label = "T1",
+    columns = c(T1_OR, T1_p)
+  ) %>%
+  tab_spanner(
+    label = "T2",
+    columns = c(T2_OR, T2_p)
+  ) %>%
+  tab_spanner(
+    label = "T3",
+    columns = c(T3_OR, T3_p)
+  )
+
+```
+
+Para realizar el modelo de regresión logística se ha contruido una nueva variable llamada obesidad (sí/no). Esta variable se ha contruido a partir de la variable IMC, donde los individuos con un IMC igual o superior a 30 se consideraron obesos, mientras que aquellos con un IMC menor a 30 se consideraron individuos sin obesidad. El corte en 30 se rige por los rangos aceptados por la Organización Mundial de la Salud. 
+Se utiliza un modelo de regresión logística binario al tener la variable obesidad (sí/no).
+Para el modelo se seleccionaron las variables de los terciles de PC1, PC2 y PC3 (los 3 primeros componentes principales que más información contienen tal y como se ha visto anteriormente), la edad y el sexo.
+En el modelo de regresión logística no se observan diferencias estadisticamente significativas entre los terciles del primer componente principal y la obesidad, tomando el primer tercil como categoría de referencia. Tampoco se ven diferencias con la edad ni el sexo.
+Hay que destacar que el tamaño muestral es limitado y por tanto las estimaciones que realiza el modelo son a la vez limitadas y por tanto imprecisas. Esto se observa en la tabla 5 con los amplios intervalos de confianza resultantes.

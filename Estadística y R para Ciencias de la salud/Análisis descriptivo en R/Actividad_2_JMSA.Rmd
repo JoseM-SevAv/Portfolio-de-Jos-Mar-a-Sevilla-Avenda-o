@@ -1,0 +1,173 @@
+---
+title: "Resolución Actividad 2 máster Bioinformática UNIR (2025)"
+author: "José María Sevilla Avendaño"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r librerias, include=FALSE}
+
+library(dplyr) 
+library(gtsummary) 
+library(gt) 
+library(nortest) 
+```
+
+En esta actividad aplicaremos los conceptos aprendidos sobre bioestadística descriptiva. Utilizarás un dataset que contiene información de la expresión de 30 genes en 65 pacientes, cada uno con distintos tipos de tratamiento y características tumorales. 
+
+El objetivo principal, en primer lugar, se pretende comprobar la normalidad de la distribución de la expresión de los genes para asegurar los supuestos estadísticos necesarios. 
+
+### 1.	Comprobar la normalidad de los genes y realizar una interpretación de los resultados obtenidos:
+
+
+## Test de normalidad Anderson-Darling
+
+```{r apartado_1, echo=FALSE}
+setwd("C:/Users/chema/Desktop/Master bioinformatica/Estadística y R para Ciencias de la Salud/Actividad 2/mubio02_act2")
+
+df <- read.csv("MUBioinfo_dataset_genes_oct2025.csv")
+
+genes <- df %>% select(starts_with("AQ"))
+
+genes.names <- variable.names(genes)
+
+Gen <- c()
+Método <- c()
+P_valor <- c()
+Interpretación <- c()
+
+for (i in 1:length(genes.names)){
+  genes.ad <- ad.test(genes[[genes.names[i]]])
+  genes.ad$data.name <- genes.names[i]
+  Gen[genes.names[i]] <- genes.ad$data.name
+  P_valor[genes.names[i]] <- genes.ad$p.value
+  Método <- genes.ad$method
+  if (P_valor[genes.names[i]] < 0.05) {
+    Interpretación[genes.names[i]] <- "No paramétrica"
+  }
+  if (P_valor[genes.names[i]] > 0.05) {
+    Interpretación[genes.names[i]] <- "Variable paramétrica"
+  }
+}
+
+ad <- data.frame(Gen, Método, P_valor, Interpretación)
+
+ad %>% gt() %>% tab_footnote(
+  footnote = "Normality test applied", 
+  locations = cells_column_labels(columns = Método)) %>%
+  tab_footnote(footnote = "Anderson-Darling normality p-value test", locations = cells_column_labels(columns = P_valor)) %>%
+  tab_footnote(footnote = "Null hypothesis (H0) verification", locations = cells_column_labels(columns = Interpretación))
+
+```
+
+En este caso podemos observar que ninguno de los genes sigue una distribución normal. 
+
+Para comprobar esto, hemos usado una prueba de normalidad Anderson-Darling, la cual se recomienda usar cuando tenemos entre 20 y 1000 observaciones (65 en este caso, las cuales se corresponden con el número de pacientes). Al igual que muchas pruebas de normalidad, usamos un intervalo de confianza de 0.05 (p-value < 0.05). En todos los casos observados se ha obtenido un intervalo de confianza mucho menor a 0.05, con estos valores rechazamos la hipótesis nula de que las variables genes sigan una distribución normal.
+
+Por lo tanto, se asumirá que estas variables no se ajustan a criterios paramétricos. Para realizar un estudio estadístico sobre estos datos se usarán cálculos de estadística no paramétrica. Como veremos más adelante, no se pueden usar medias como la media aritmética o la medida de la dispersión por medio de la desviación estándar, ya que las observaciones de los datos no siguen una distribución continua en forma de campana simétrica. En su lugar se usarán otro tipo de cálculos para estadística no paramétrica.
+
+### 2.	Calcular y analizar estadísticas descriptivas de los valores sin transformar (media + desviación estándar si son paramétricas, mediana + rango intercuartílico (p25-p75) si no lo son) de las variables bioquímicas, síntomas, sociodemográficas y de los genes:
+
+```{r apartado_2, echo=FALSE}
+setwd("C:/Users/chema/Desktop/Master bioinformatica/Estadística y R para Ciencias de la Salud/Actividad 2/mubio02_act2")
+
+df <- read.csv("MUBioinfo_dataset_genes_oct2025.csv")
+
+nums.df <- select_if(df, is.numeric) 
+
+nums.df$id <- NULL
+
+categorias <- variable.names(nums.df)
+
+df.p_val <- c()
+df.mediana <- c()
+df.media <- c()
+df.cuartil <- c()
+df.ds <- c()
+cats.par <- c()
+cats.nopar <- c()
+
+
+for (i in 1:length(categorias)){{
+  df.ad <- ad.test(nums.df[[categorias[i]]])
+  df.ad$data.name <- categorias[i]
+  df.p_val[categorias[i]] <- df.ad$p.value
+  if (df.p_val[categorias[i]] < 0.05) {
+    cats.nopar[categorias[i]] <- df.ad$data.name
+    df.mediana[categorias[i]] <- median(nums.df[[categorias[i]]])
+    df.cuartil[categorias[i]] <- IQR(nums.df[[categorias[i]]])
+  }
+  if (df.p_val[categorias[i]] > 0.05) {
+    cats.par[categorias[i]] <- df.ad$data.name
+    df.ds[categorias[i]] <- sd(nums.df[[categorias[i]]])
+    df.media[categorias[i]] <- mean(nums.df[[categorias[i]]])
+  }}}
+
+cat("Las variables paramétricas son:", cats.par)
+cat("Las variables no paramétricas son:", cats.nopar)
+```
+Tras ver la distribución de los datos de los genes por medio del test de normalidad de Anderson-Darling para ver si las diferentes variables son paramétricas o no, vemos que solo 6 de ellas lo son. Como hemos podido observar antes, ninguno de los genes es considerado como variable paramétrica.
+
+### •	En función del tratamiento (1er nivel) y de la extensión tumoral (2º nivel), crea una tabla descriptiva únicamente con las variables de genes.
+
+## Test Wilcoxon por tratamiento y extensión tumoral.
+
+```{r apartado2.1, echo=FALSE}
+
+
+genes <- df %>% select(tratamiento, extension, starts_with("AQ"))
+
+
+tabla <-  genes %>% tbl_strata(strata= tratamiento,
+             .tbl_fun = ~.x %>%
+               tbl_summary(by= extension,
+                           statistic = all_continuous() ~"{median} ({IQR})") %>%
+               add_p())
+
+tabla
+
+```
+
+Para hacer los cálculos bioestadísticos, como ya hemos mencionado antes, no podemos usar la media aritmética y la desviación estándar. En su lugar usaremos la mediana para ver el valor exacto al cual tienden la mayoría de observaciones, y mediremos el grado de dispersión de los datos por medio del rango intercuartílico.
+
+Usaremos la prueba de hipótesis de Wilcoxon para muestras pareadas. En nuestro caso haremos 2 separaciones, las cuales serán en función del tratamiento utilizado, y dentro de esto, en función de la extensión tumoral, obteniendo de esta forma 4 clasificaciones de los datos. Para ver si estas variables pareadas siguen la misma tendencia central.
+
+Aquí podemos encontrar 3 variantes en los diferentes genes:
+
+- Aquellos cuya tendencia central de los datos es diferente, es decir, se rechaza la hipótesis nula de que no haya diferencias (p-value < 0.05). Esto se puede interpretar como, independientemente de que haya habido tratamiento o no, los genes se expresan diferente en función de la extensión tumoral que tenga el paciente. Aquí encontramos ACTB o B2M entre otros.
+- Aquellos cuya tendencia central de los datos es diferente solo cuando son tratados con placebo, es decir, se rechaza la hipótesis nula de que no haya diferencias (p-value < 0.05) con el placebo, pero se acepta en caso de haber sido tratados. Esto se puede interpretar como que el tratamiento ha hecho efecto sobre estos grupos de genes. Estas similitudes en la expresión génica entre pacientes con extensión tumoral localizada y metastásica cuando los pacientes se tratan, pero que no aparecen cuando no se tratan las encontramos en los genes BRCA1 y BRCA2 entre otros.
+- Por último encontramos aquellos genes que independientemente del tratamiento, no se observan diferencias en la tendencia central de su expresión génica en entre los pacientes con extensión tumoral localizada y metastásica, se aceptan sus hipótesis nulas de que no haya diferencias (p-value > 0.05). Sin embargo, podemos encontrar un rango intercuartílico muy alto en comparación a la mediana, mostrandonos un amplo grado de dispersión. Este problema se podría solucionar con mas observaciones en otros pacientes. Aquí encontramos AKT1 y MYC entre otros.
+
+### •	En función de la edad en 2 categorías según la mediana (categoría 1: edad <percentil 50 de edad; categoría 2: edad >=percentil 50 de edad), crea una tabla descriptiva únicamente con las variables de genes.
+
+## Test Wilcoxon por edad.
+
+```{r apartado_2.2, echo=FALSE}
+
+genes2 <- df %>% select(edad, starts_with("AQ"))
+
+edad.media <- median(genes2$edad)
+
+genes2 <- genes2 %>%
+  mutate(edades = if_else(edad >= edad.media, "Edad_cat ≥ percentil 50", "Edad_cat < percentil 50"))
+
+genes2$edad <- NULL
+
+tabla2 <-  genes2  %>% tbl_summary(by = edades, statistic = all_continuous() ~"{median} ({IQR})") %>%
+  add_p()
+
+tabla2
+```
+
+Al igual que con la anterior tabla, aquí veremos como se comportan los genes en función de la edad de la población, separando aquello con mayor edad de aquellos con menor edad, para ver si la edad es un factor importante en la expresión génica.
+
+Al igual que antes usaremos el test de Wilcoxon para muestras pareadas a partir de los cálculos estadísticos de la mediana y el rango intercuartílico. 
+
+Aquí encontramos 2 tipos de resultados:
+- Aquellos cuya tendencia central no presenta diferencias en la expresión génica en función de la edad, este tipo de resultados se encuentra en la inmensa mayoría de genes. Aquí aceptaríamos la hipótesis nula de que no hay diferencias en función de la edad (p-value > 0.05). Sin embargo, si nos fijamos en los resultados vemos que las medianas obtenidas son muy diferentes y sus rangos intercuartílicos muy altos, lo que nos muestra un rango de dispersión muy amplio en los resultados de los genes. Una medida para solucionar este error podría ser realizar el estudio con más observaciones. 
+- Aquellos cuya tendencia central si presenta diferencias en la expresión génica en función de la edad. Aquí rechazaríamos la hipótesis nula de que no hay diferencias en función de la edad (p-value < 0.05). Aunque aquí encontramos el mismo problema que en el otro grupo: las medianas si que son diferentes, pero el rango intercuartílico es muy grande.
