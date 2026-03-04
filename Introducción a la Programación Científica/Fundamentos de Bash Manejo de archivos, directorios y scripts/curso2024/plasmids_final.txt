@@ -1,0 +1,8 @@
+Zymomonas mobilis subsp. mobilis ZM4 = ATCC 31821	Bacteria	Pseudomonadota	Alphaproteobacteria	pER79ap39	NZ_CP036461.1	CP036461	39.272	42.473	28	-	-	-	33	5
+Zymomonas mobilis subsp. mobilis ZM4 = ATCC 31821	Bacteria	Pseudomonadota	Alphaproteobacteria	pZZM401	-	CP001881.1	37.066	42.3785	51	-	-	-	53	2
+Zymomonas mobilis subsp. mobilis ZM4 = ATCC 31821	Bacteria	Pseudomonadota	Alphaproteobacteria	pZZM402	-	CP001882.1	33.915	42.2763	30	-	-	-	33	3
+Zymomonas mobilis subsp. mobilis ZM4 = ATCC 31821	Bacteria	Pseudomonadota	Alphaproteobacteria	pZZM403	-	CP001883.1	32.801	43.3036	21	-	-	-	25	4
+Zymomonas mobilis subsp. mobilis ZM4 = ATCC 31821	Bacteria	Pseudomonadota	Alphaproteobacteria	pZZM404	-	CP001884.1	32.4	43.6914	28	-	-	-	31	3
+Zymomonas mobilis subsp. mobilis ZM4 = ATCC 31821	Bacteria	Pseudomonadota	Alphaproteobacteria	pZZM405	-	CP001885.1	30.952	43.6999	26	-	-	-	27	1
+Zymomonas mobilis subsp. pomaceae ATCC 29192	Bacteria	Pseudomonadota	Alphaproteobacteria	pZYMOP01	NC_015715.1	CP002866	37.387	40.9608	37	-	-	-	39	2
+Zymomonas mobilis subsp. pomaceae ATCC 29192	Bacteria	Pseudomonadota	Alphaproteobacteria	pZYMOP02	NC_015716.1	CP002867	34.161	43.9975	35	-	-	-	37	2

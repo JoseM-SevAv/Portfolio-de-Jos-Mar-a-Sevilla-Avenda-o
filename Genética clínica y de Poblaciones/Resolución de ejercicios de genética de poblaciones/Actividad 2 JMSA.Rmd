@@ -1,0 +1,205 @@
+---
+title: "Actividad 2. Resolución de ejercicios de genética de poblaciones"
+author: "José María Sevilla Avendaño"
+date: "`r Sys.Date()`"
+output:
+  html_document: default
+  word_document: default
+  pdf_document: default
+---
+```{r librerias, echo=FALSE}
+library(tinytex)
+```
+## 1.	En una población, las frecuencias genotípicas para dos loci independientes son las siguientes. Determine si la población está en equilibrio para estos loci:
+### ▸	Locus A,a → Homocigotos dominantes: 0,09. Heterocigotos: 0,42. Homocigotos recesivos: 0,49.
+### ▸	Locus B,b → Homocigotos dominantes: 0,64. Heterocigotos: 0,32. Homocigotos recesivos: 0,04.
+
+Para que se cumpla el equilibrio de Hardy-Weinberg, se debe cumplir que:
+$$(p+q)^2=1$$ 
+Resolviendo vemos que la siguiente formula: 
+$$p^2 + 2pq +q^2 = 1$$
+#### En nuestro caso, para los locus A,a y B,b, determinaremos los valores de p y de q. Como ya sabemos:
+$$AA = p^2\\
+Aa = 2pq\\
+aa = q^2$$
+#### Esto tambien es aplicable al locus B,b. Empecemos obteniendo la frecuencia alelica de los alelos A y a del locus A,a.
+
+
+$$
+AA = 0.09 \\
+aa = 0.49 \\
+p = \sqrt[2]{0.09} \\ 
+q = \sqrt[2]{0.49}
+$$
+```{r Problema 1.1, echo=TRUE}
+# Calculo matemático de las frecuencias alelicas p y q para el locus A,a.
+
+AA = 0.09
+Aa = 0.42
+aa = 0.49
+p = sqrt(AA)
+q = sqrt(aa)
+
+cat(" p =", p, "\n","q =", q)
+```
+Vemos que la frecuencia alelica de p es 0.3 
+Y que la frecuencia alelica de q es 0.7
+Aquí podemos ver que:
+$$0.3 + 0.7 = 1$$
+Resolviendo la formula de antes:
+$$p^2 + 2pq +q^2 = 1$$
+$$0.3^2 + 2*0.3*0.7 + 0.7^2 = 1$$
+$$0.09 + 0.42 + 0.49 = 1$$
+```{r Problema 1.2, echo=TRUE}
+# Representación matemática del calculo de (p+q)^2 para el locus A,a.
+
+Resultado.Aa <- (q+p)^2
+cat("(p+q)^2 =",Resultado.Aa)
+```
+Podemos observar que el resultado de la opración es igual a 1, lo cual nos indica que la población está en equilibrio para el locus A,a.
+
+Ahora calcularemos los valores de p y de q para el locus B,b. Al igual que antes:
+$$BB = p^2\\
+Bb = 2pq\\
+bb = q^2$$
+Obtenemos la frecuencia alelica de los alelos B y b del locus B,b.
+
+
+$$
+AA = 0.64 \\
+aa = 0.04 \\
+p = \sqrt[2]{0.64} \\ 
+q = \sqrt[2]{0.04}
+$$
+```{r Problema 1.3}
+# Representación matemática del cálculo de la frecuencia alélica del locus B,b.
+BB = 0.64
+Bb = 0.32
+bb = 0.04
+p.b = sqrt(BB)
+q.b = sqrt(bb)
+
+cat(" p =", p.b, "\n","q =", q.b)
+```
+Aquí podemos ver que:
+$$
+0.8 + 0.2 = 1
+$$
+Resolviendo la formula de antes:
+$$p^2 + 2pq +q^2 = 1$$
+$$0.8^2 + 2*0.8*0.2 + 0.2^2 = 1$$
+$$0.64 + 0.32 + 0.04 = 1$$
+```{r Problema 1.4}
+# Representación matemática del calculo (p+q^2) para el locus B,b
+
+Resultado.Bb <- (q.b+p.b)^2
+cat("(p+q)^2 =", Resultado.Bb)
+```
+Podemos observar que el resultado de la operación es igual a 1 ,lo cual nos indica que la población está en equilibrio para el locus B,b. 
+
+## 2.	En una granja de aves, se han encontrado 224 individuos de plumaje rizado fuerte, 500 de tipo liso y 676 de rizado intermedio. Calcule las frecuencias alélicas e indique si esta población de aves se encuentra en equilibrio mediante una prueba χ2.
+
+Aquí empezamos con una población de aves con 3 tipos de plumaje:
+$$Rizado \ fuerte = 224 \ individuos\\
+Rizado \ intermedio = 676 \ individuos\\
+Tipo \ liso = 500 \ individuos$$
+```{r problema 2.1}
+
+# Representación matemática del total de aves.
+
+RF <- 224
+TL <- 500
+RI <- 676
+
+Total <- sum(RF, RI, TL)
+cat("Total de individuos =", Total)
+```
+$$Total \ de \ individuos=1400$$
+Contando con un total de 1400 individuos. Suponemos que el genotipo rizado fuerte es AA, el de rizado intermedio es Aa y el de tipo liso es aa en una situación de dominancia incompleta.
+
+Calculamos las frecuencias genotípicas observadas usando esta fórmula:
+$$Frecuencia \ genotípica \ observada= \frac{Número \ de \ individuos \ con \ un \ genotipo \ especifico }{ Total \ de \ la \ poblacion}$$
+```{r problema 2.2}
+# Representación matemática del calculo de frecuencias genotípicas
+
+frec.RF <- RF / (Total)
+frec.TL <- TL / (Total)
+frec.RI <- RI / (Total)
+
+cat(" Frecuencia Rizado Fuerte =",round(frec.RF, digits = 4),"\n", "Frecuencia Rizado Intermedio =",round(frec.RI, digits = 4), "\n", "Frecuencia Tipo Liso",  round(frec.TL, digits = 4),"\n")
+```
+Obtenemos que las frecuencias genotípicas son:
+$$Frecuencia \ genotípica \ del \ Rizado \ Fuerte = 0.16 \\
+Frecuencia \ genotípica \ del \ Rizado \ Intermedio = 0.4829 \\
+Frecuencia \ genotípica \ del \ Tipo \ Liso = 0.3571$$
+Ademas, podemos obtener la frecuencia alélica observada mediante la formula:
+$$ Frecuencia \ alélica \ del \ alelo \ A = \frac{(2*AA + Aa)}{(Total \ de \ individuos *2)} \\
+Frecuencia \ alélica \ del \ alelo \ a = \frac{(2*aa + Aa)}{(Total \ de \ individuos * 2)}$$
+$$Frecuencia \ alélica \ del \ alelo \ A=\frac{(2*224 + 676)}{(2*1400)} \\
+Frecuencia \ alélica \ del \ alelo \ a=\frac{(2*500 + 676)}{(2*1400)}$$
+\frac{(a + b)^2}{b^2}
+```{r Problema 2.3}
+# Representación matemática del cálculo de la frecuencia alélica.
+
+A <- (2 * RF + RI)/(2 * Total)
+a <- (2 * TL + RI)/(2 * Total)
+
+cat(" Frecuencia del alelo A =", round(A, 4), "\n", "Frecuencia del alelo a=", round(a,4))
+```
+
+Obteniendo de esta forma:
+$$Frecuencia \ alélica \ del \ alelo \ A=0.4014\\
+Frecuencia \ alélica \ del \ alelo \ a=0.5986$$
+Con las frecuencias alelicas podemos calcular la posibilidad de cada uno de los genotipos esperados, usando la siguiente fórmula:
+$$Frecuencia \ genotípica \ esperada \ del \ genotipo \ AA= (Frecuencia \ alélica \ del \ alelo \ A)^2 \\
+Frecuencia \ genotípica esperada \ del \ genotipo \ Aa=2*Frecuencia \ alélica \ del \ alelo \ A*Frecuencia \ alélica \ del \ alelo \ a \\
+Frecuencia \ genotípica \ esperada \ del \ genotipo \ aa= (Frecuencia \ alélica \ del \ alelo \ a)^2$$
+
+$$Frecuencia \ genotípica \ esperada \ del \ genotipo \ AA= 0.4014^2 \\
+Frecuencia \ genotípica \ esperada \ del \ genotipo \ Aa=2*0.4014*0.5986\\
+Frecuencia \ genotípica \ esperada \ del \ genotipo \ aa= 0.5986^2$$
+
+
+```{r Problema 2.4}
+# Representación matemática del cálculo de la frecuencia genotípicas esperadas.
+
+esperado.AA <- (A)^2
+esperado.aa <- (a)^2
+esperado.Aa <- 2*a*A
+
+cat("Frecuencia genotípica esperada para AA =" , round(esperado.AA,4),"\n", "Frecuencia genotípica esperada para Aa", round(esperado.Aa, 4), "\n", "Frecuencia genotípica esperada para aa", round(esperado.aa,4))
+``` 
+Obteniendo de esta forma:
+$$Frecuencia \ genotípica \ esperada \ del \ genotipo \ AA= 0.1611 \\
+Frecuencia \ genotípica \ esperada \ del \ genotipo \ Aa=0.4806\\
+Frecuencia \ genotípica \ esperada \ del \ genotipo \ aa= 0.3583$$
+Con estas frecuencias genotípicas esperadas somos capaces de hacer la prueba $\chi^2$ de Pearson para determinar si la población está en equilibrio Hardy-Weinberg o no. Para ello usaremos la siguiente formula.
+$$\chi^2 = \Sigma \frac{(individuos \ observados - individuos \ esperados)^2}{individuos \ esperados^2} $$
+$$\chi^2 = \Sigma \frac{(individuos \ observados - (total \ de \ individuos * frecuencia \ genotípica \ esperada)^2}{individuos \ esperados^2} $$
+$$\chi^2 = \Sigma \frac{(224 - (1400 * 0.1611))^2}{(1400 * 0.1611)^2} + \frac{(676 - (1400 * 0.4806))^2}{(1400 * 0.4806)^2}+ \frac{(500 - (1400 * 0.3583))^2}{(1400 * 0.3583)^2}$$
+```{r problema 2.5}
+# Representación matemática del calculo chi cuadrado$
+
+X2.AA <- ((RF - (Total*esperado.AA))^2)/(Total*esperado.AA)
+X2.Aa <- ((RI - (Total*esperado.Aa))^2)/(Total*esperado.Aa)
+X2.aa <- ((TL - (Total*esperado.aa))^2)/(Total*esperado.aa)
+
+X2 <- sum(X2.AA, X2.Aa, X2.aa)
+
+cat("La prueba chi cuadrado de Pearson da", round(X2, 4))
+```
+Obteniendo de esta forma: 
+$$\chi^2 = 0.0318$$
+Una vez hemos calculado el $\chi^2$ de la población, nos quedaría calcular los grados de libertad de los que disponemos para calcular nuestro p-valor, el cual nos permitirá aceptar o rechazar la hipotesis nula de que la población se encuentra en equilibrio Hardy-Weinberg.
+Para calcular los grados de libertad contamos con 3 parametros (AA,Aa,aa) y un parámetro estimado, puesto que la frecuencia alélica de "a" se puede calcular mediante 1 - A. 
+$$Grados \ de \ libertad = número \ de \ clases \ de \ datos \ (3)- número \ de\ parámetros \ estimados \ (1)-1$$
+$$Grados \ de \ libertad = 1$$
+Habiendo calculado nuestro $\chi^2$ y nuestros grados de libertad podemos compara estos valores en una tabla de regresión para obtener nuestro p-valor. En este caso, Rstudio posee una función que permite conocer el valor de nuestro p-valor para aceptar o rechazar nuestra hipotesis nula.
+```{r problema 2.6}
+# Representación matemática del cálculo del p-valor.
+p_valor <- pchisq(X2, df = 1, lower.tail = FALSE)
+
+cat("p-valor =", round(p_valor,4))
+```
+$$p-valor = 0.8585$$
+Usando la formula que hemos mencionado antes, obtenemos el p-value introduciendo los valores del chi-cuadrado y los grados de libertad, obteniendo un valor de 0.8585, lo cual nos permite aceptar la hipotesis nula al superar el valor de p-value de referencia de 0.05, concluyendo de esta forma que la población de aves se encuentra en equilibrio Hardy-Weinberg para este locus en concreto.
