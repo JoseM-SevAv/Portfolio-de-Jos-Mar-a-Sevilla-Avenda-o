@@ -23,7 +23,11 @@ $Frecuencia \ genotípica \ esperada \ del \ genotipo \ aa=Frecuencia \ alélica
 
 A partir de aquí, podemos calcular el $\chi^2$ con el que veremos si la población está en equilibrio Hardy Weinberg o no.
 
-$\chi^2 = \Sigma(individuos \ observados−(total \ de \ individuos∗frecuencia \ genotípica \ esperada)^2/(total \ de \ individuos∗frecuencia \ genotípica \ esperada)^2$
+$\chi^2 = \Sigma(individuos \ observados−individuos \ esperados)^2/(individuos \ esperados)^2$
+
+O lo que es lo mismo:
+
+$\chi^2 = \Sigma(individuos \ observados−(total \ de \ individuos∗frecuencia \ genotípica \ esperada))^2/(total \ de \ individuos∗frecuencia \ genotípica \ esperada)^2$
 
 $Frecuencia \ genotípica \ esperada \ del \ genotipo \ AA= (Frecuencia \ alélica \ del \ alelo \ A)^2$
 $$Frecuencia genotípica esperada del genotipo Aa=2*Frecuencia alélica del alelo A*Frecuencia alélica del alelo a$$
