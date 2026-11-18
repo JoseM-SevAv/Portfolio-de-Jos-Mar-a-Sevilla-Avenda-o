@@ -37,6 +37,6 @@ $Grados \ de \ libertad = Número \ de \ clases \ de \ datos \ (3)- Número \ de
 
 Ya que tenemos calculados tanto $\chi^2$ como el número de grados de libertad, solo nos queda hacer la fórmula para obtener el p-valor. En R podemos usar la siguiente función.
 
-$p_valor <- pchisq(X2, df = 1, lower.tail = FALSE)$
+$p.valor <- pchisq(X2, df = 1, lower.tail = FALSE)$
 
 A partir de aquí, y dependiendo de nuestro p-valor de referencia, que normalmente suele ser 0.05, si nuestro p-valor es mayor se acepta la hipótesis nula de que la población está en equilibrio Hardy-Weinberg. Por el contrario, si es menor se rechazaría.
