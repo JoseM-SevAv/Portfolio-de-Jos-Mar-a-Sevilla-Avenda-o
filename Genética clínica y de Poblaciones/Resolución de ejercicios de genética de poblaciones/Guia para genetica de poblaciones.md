@@ -12,9 +12,9 @@ $Frecuencia \ genotípica \ del \ genotipo \ aa=Número \ de \ individuos \ con 
 
 A partir de aquí se pueden calcular las frecuencias alélicas observadas.
 
-$Frecuencia \ alélica \ A=(2*Número \ de \ individuos \ AA+Número \ de \ individuos\ Aa)/(2*Total \ de \ individuos)$
+$Frecuencia \ alélica \ A=(2*Número \ de \ individuos \ AA+Número \ de \ individuos \ Aa)/(2*Total \ de \ individuos)$
 
-$Frecuencia \ alélica \ a=(2*Número \ de \ individuos \ aa+Número \ de \ individuos\ Aa)/(2*Total \ de \ individuos)$
+$Frecuencia \ alélica \ a=(2*Número \ de \ individuos \ aa+Número \ de \ individuos \ Aa)/(2*Total \ de \ individuos)$
 
 Con estas frecuencias alélicas obtenemos las frecuencias genotípicas esperadas.
 
