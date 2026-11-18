@@ -2,7 +2,7 @@ Si una población está en equilibrio Hardy-Weinberg, se cumplirá la formula $(
 
 La suma de $p^2 + 2pq + q^2$ debe dar 1 para que este equilibrio se cumpla, esto engloba los homocigóticos AA y aa, y los heterocigóticos Aa. Además se cumple que $p+q=1$.
 
-En el caso de que tengamos una población con distintos genotipos, para comprobar si la población cumple el equilibrio Hardy Weinberg se realizará una prueba de Chi cuadrado. Para ello debemos calcular las frecuencias alélicas observadas y esperadas.
+En el caso de que tengamos una población con distintos genotipos, para comprobar si la población cumple el equilibrio Hardy Weinberg se realizará una prueba de $\chi^2$. Para ello debemos calcular las frecuencias alélicas observadas y esperadas.
 
 Primero se calculará la frecuencia genotípica observada. Se calculará a partir del número de individuos que posean un genotipo específico en la población.
 
@@ -13,7 +13,6 @@ $Frecuencia \ genotípica \ del \ genotipo \ aa=Número \ de \ individuos \ con 
 A partir de aquí se pueden calcular las frecuencias alélicas observadas.
 
 $Frecuencia \ alélica \ A=(2*(Número \ de \ individuos \ AA)+Número \ de \ individuos \ Aa)/(2*(Total \ de \ individuos))$
-
 $Frecuencia \ alélica \ a=(2*(Número \ de \ individuos \ aa)+Número \ de \ individuos \ Aa)/(2*(Total \ de \ individuos))$
 
 Con estas frecuencias alélicas obtenemos las frecuencias genotípicas esperadas.
@@ -21,6 +20,8 @@ Con estas frecuencias alélicas obtenemos las frecuencias genotípicas esperadas
 $Frecuencia \ genotípica \ esperada \ del \ genotipo \ AA=Frecuencia \ alélica \ del \ alelo \ A^2$
 $Frecuencia \ genotípica \ esperada \ del \ genotipo \ Aa=2*(Frecuencia \ alélica \ del \ alelo \ a*Frecuencia \ alélica \ del \ alelo \ A)$
 $Frecuencia \ genotípica \ esperada \ del \ genotipo \ aa=Frecuencia \ alélica \ del \ alelo \ a^2$
+
+A partir de aquí, podemos calcular el 
 
 $Frecuencia \ genotípica \ esperada \ del \ genotipo \ AA= (Frecuencia \ alélica \ del \ alelo \ A)^2$
 $$Frecuencia genotípica esperada del genotipo Aa=2*Frecuencia alélica del alelo A*Frecuencia alélica del alelo a$$
