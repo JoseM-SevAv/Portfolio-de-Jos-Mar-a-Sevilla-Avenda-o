@@ -29,6 +29,12 @@ O lo que es lo mismo:
 
 $\chi^2 = \Sigma(individuos \ observados−(total \ de \ individuos∗frecuencia \ genotípica \ esperada))^2/(total \ de \ individuos∗frecuencia \ genotípica \ esperada)^2$
 
+Se hará el sumatorio de cada una de las variantes genotípicas AA, Aa y aa.
+
+Una vez hemos calculado el $\chi^2$ de la población, nos quedaría calcular los grados de libertad de los que disponemos para calcular nuestro p-valor, el cual nos permitirá aceptar o rechazar la hipótesis nula de que la población se encuentra en equilibrio Hardy-Weinberg. Para calcular los grados de libertad contamos con 3 parámetros (AA,Aa,aa) y un parámetro estimado, puesto que la frecuencia alélica de “a” se puede calcular mediante 1 - A.
+
+$Grados \ de \ libertad = Número \ de \ clases \ de \ datos \ (3)- Número \ de\ parámetros \ estimados \ (1)-1$
+
 $Frecuencia \ genotípica \ esperada \ del \ genotipo \ AA= (Frecuencia \ alélica \ del \ alelo \ A)^2$
 $$Frecuencia genotípica esperada del genotipo Aa=2*Frecuencia alélica del alelo A*Frecuencia alélica del alelo a$$
 $$Frecuencia genotípica esperada del genotipo aa= (Frecuencia alélica del alelo a)^2$$
