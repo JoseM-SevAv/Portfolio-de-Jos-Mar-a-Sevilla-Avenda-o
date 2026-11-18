@@ -6,9 +6,9 @@ En el caso de que tengamos una población con distintos genotipos, para comproba
 
 Primero se calculará la frecuencia genotípica observada. Se calculará a partir del número de individuos que posean un genotipo específico en la población.
 
-$Frecuencia \ genotípica \ del \ genotipo \ AA={Número \ de \ individuos \ con \ genotipo \ AA/Total \ de \ individuos}$
-$Frecuencia \ genotípica \ del \ genotipo \ Aa=\frac{Número \ de \ individuos \ con \ genotipo \ Aa/Total \ de \ individuos}$
-$Frecuencia \ genotípica \ del \ genotipo \ aa=\frac{Número \ de \ individuos \ con \ genotipo \ aa/Total \ de \ individuos}$
+$Frecuencia \ genotípica \ del \ genotipo \ AA=Número \ de \ individuos \ con \ genotipo \ AA/Total \ de \ individuos$
+$Frecuencia \ genotípica \ del \ genotipo \ Aa=Número \ de \ individuos \ con \ genotipo \ Aa/Total \ de \ individuos$
+$Frecuencia \ genotípica \ del \ genotipo \ aa=Número \ de \ individuos \ con \ genotipo \ aa/Total \ de \ individuos$
 
 A partir de aquí se pueden calcular las frecuencias alélicas observadas.
 
