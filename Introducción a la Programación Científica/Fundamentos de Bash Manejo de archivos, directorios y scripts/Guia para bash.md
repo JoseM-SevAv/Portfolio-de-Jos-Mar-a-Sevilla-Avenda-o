@@ -138,7 +138,7 @@ Nos da el identificador o pid 1128, tras el comando jobs -l vemos que se está e
         "kill" nos permite acabar con los procesos activos indicando su PID.
 Kill 1128
 
-16.	Escribe un Shell script que se llame con un argumento. Ese argumento será el nombre X de una persona, y será usado para mostrar por pantalla: «Soy X, y me gusta el máster de bioinformática»
+### 16.	Escribe un Shell script que se llame con un argumento. Ese argumento será el nombre X de una persona, y será usado para mostrar por pantalla: «Soy X, y me gusta el máster de bioinformática»
 
         Para este ejercicio crearemos un archivo .sh con "nano nombre_del_archivo.sh"
 nano argumento.sh
@@ -171,7 +171,7 @@ José María
         Respuesta.
 Soy José María, y me gusta el máster de bioinformática.
 
-17.	Escribe un Shell script que lea como argumento una nota numérica y muestre la correspondiente alfabética. Es decir, N<5 es suspenso, 5<=N<7 es aprobado, 7<=N<9 es notable y 9<=N<=10 es sobresaliente.
+### 17.	Escribe un Shell script que lea como argumento una nota numérica y muestre la correspondiente alfabética. Es decir, N<5 es suspenso, 5<=N<7 es aprobado, 7<=N<9 es notable y 9<=N<=10 es sobresaliente.
 
         Al igual que en el ejercicio anterior empezamos igual.
 nano notas.sh
@@ -218,7 +218,7 @@ Introduce el argumento numérico
         Respuesta final
 Notable
 
-18.	Escribe un Shell script que compruebe si un fichero introducido por el usuario existe. La ruta de dicho fichero se debe definir dentro de una variable llamada FILE al comienzo del script. Primero debes comprobar si el fichero existe, si es así, debes imprimir el mensaje «El fichero X existe» (siendo X la ruta al fichero según FILE); si no existe, debes decir que «el fichero X no existe».
+### 18.	Escribe un Shell script que compruebe si un fichero introducido por el usuario existe. La ruta de dicho fichero se debe definir dentro de una variable llamada FILE al comienzo del script. Primero debes comprobar si el fichero existe, si es así, debes imprimir el mensaje «El fichero X existe» (siendo X la ruta al fichero según FILE); si no existe, debes decir que «el fichero X no existe».
 
         Empezamos como en los dos últimos ejercicios.
 nano file.sh
