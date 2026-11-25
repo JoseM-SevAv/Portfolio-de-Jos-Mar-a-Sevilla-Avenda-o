@@ -137,3 +137,112 @@ Nos da el identificador o pid 1128, tras el comando jobs -l vemos que se está e
 
         "kill" nos permite acabar con los procesos activos indicando su PID.
 Kill 1128
+
+16.	Escribe un Shell script que se llame con un argumento. Ese argumento será el nombre X de una persona, y será usado para mostrar por pantalla: «Soy X, y me gusta el máster de bioinformática»
+
+        Para este ejercicio crearemos un archivo .sh con "nano nombre_del_archivo.sh"
+nano argumento.sh
+
+        Dentro del archivo escribiremos lo siguiente:
+
+        Primero especificaremos el intérprete que se usará escribiendo esta primera línea, también llamada shebang, indica que deberá usarse el interprete bash.
+#!/bin/bash
+
+        Primero preguntaremos el nombre, en este ejercicio es llamado argumento.
+echo "Introduce el argumento"
+
+        Metemos la variable argumento, que nombraremos nosotros.
+read argumento
+
+        Escribimos la salida de forma que use la variable argumento que le hemos proporcionado como parte de la frase que nos devolverá.
+        Finalmente indicamos la frase final llamando a nuestro argumento con "echo".
+echo Soy $argumento, y me gusta el máster de bioinformática.
+
+
+        Llamamos al interprete bash para comprobar el archivo ".sh".
+bash argumento.sh
+
+        Primera frase que nos indica.
+Introduce el argumento
+
+        Introducimos nuestro argumento.
+José María
+
+        Respuesta.
+Soy José María, y me gusta el máster de bioinformática.
+
+17.	Escribe un Shell script que lea como argumento una nota numérica y muestre la correspondiente alfabética. Es decir, N<5 es suspenso, 5<=N<7 es aprobado, 7<=N<9 es notable y 9<=N<=10 es sobresaliente.
+
+        Al igual que en el ejercicio anterior empezamos igual.
+nano notas.sh
+
+#!/bin/bash
+
+        Pedimos un argumento numérico.
+echo "Introduce un argumento numérico"
+
+        Creamos el argumento que escribiremos nosotros.
+read argumento
+
+        Añadimos el variables para cada una de las notas.
+Aprobado=5
+Notable=7
+Sobresaliente=9
+Matricula=10
+
+        Creamos nuestro bucle para clasificar la nota entre suspenso, aprobado, notable o sobresaliente. En el bucle "-lt" funciona como menor que, "-le" como mayor que, "-eq" como igual a y "-a" es y, para añadir nuevas condiciones. Si se cumple cualquiera de las condiciones se obtendrá una respuesta.
+if [ $argumento -lt $Aprobado ]
+then
+        echo "Suspenso" 
+elif [ $Aprobado -le $argumento -a $argumento -lt $Notable ]
+then
+        echo "Aprobado" 
+elif [ $Notable -le $argumento -a $argumento -lt $Sobresaliente ]
+then
+        echo "Notable"
+elif [ $Sobresaliente -le $argumento -a $argumento -lt $Matricula ]
+then
+        echo "Sobresaliente"
+elif [ $argumento -eq $matricula ]
+then
+        echo "Matricula"
+fi
+
+        Comprobamos nuestro código.
+bash notas.sh
+
+        Primera respuesta, además escribimos nuestro argumento.
+Introduce el argumento numérico
+7
+
+        Respuesta final
+Notable
+
+18.	Escribe un Shell script que compruebe si un fichero introducido por el usuario existe. La ruta de dicho fichero se debe definir dentro de una variable llamada FILE al comienzo del script. Primero debes comprobar si el fichero existe, si es así, debes imprimir el mensaje «El fichero X existe» (siendo X la ruta al fichero según FILE); si no existe, debes decir que «el fichero X no existe».
+
+        Empezamos como en los dos últimos ejercicios.
+nano file.sh
+
+        En este caso buscamos un archivo en el sistema para indicar si existe o no, asi que indicamos el directorio completo.
+#!/bin/bash
+
+echo "Introduce el directorio del archivo a encontrar"
+
+read FILE
+
+        Si es capaz de encontrarlo con el bucle if nos servirá para ver si el archivo existe o no, usamos "-f $FILE" para buscarlo.
+if [ -f $FILE ]
+then
+        echo El fichero $FILE existe.
+else
+        echo El fichero $FILE no existe.
+fi
+
+        Hacemos un bash file.sh e indicamos los archivos a encontrar.
+
+bash file.sh
+Introduce el directorio del archivo a encontrar
+
+        En nuestro caso queremos encontrarlo dentro de nuestro directorio.
+dormir.sh
+El fichero dormir.sh existe
