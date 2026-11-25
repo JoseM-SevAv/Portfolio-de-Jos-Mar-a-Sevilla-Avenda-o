@@ -80,26 +80,60 @@ tar -xf curso2024/plasmids.gz
     ">>" sirve para añadir lo que queramos al archivo destino, mientras que ">" sobrescribe el contenido del archivo destino con lo que escribamos antes. Con "tail -n8" lo que hacemos es seleccionar las 8 últimas lineas de texto del fichero de texto y sobrescribir el siguiente archivo de texto con ">"
 tail -n8 curso2024/plasmids.txt > curso2024/plasmids_final.txt
 
-10.	Muestra las 4 primeras filas del archivo plasmids_final.txt por pantalla. 
+### 10.	Muestra las 4 primeras filas del archivo plasmids_final.txt por pantalla.
+
+        "head" nos permite ver las primeras líneeas del archivo, podemos seleccionar la cantidad de líneas que queremos ver con "-n" (4 en nuestro caso "-n4").
 head -n4 curso2024/plasmids_final.txt
 
-Zymomonas mobilis subsp. mobilis ZM4 = ATCC 31821       Bacteria        Pseudomonadota  Alphaproteobacteria     pER79ap39       NZ_CP036461.1   CP036461        39.272  42.473  28      -       -       -       33      5
+Zymomonas mobilis subsp. mobilis ZM4 = ATCC 31821       Bacteria        Pseudomonadota  Alphaproteobacteria     pER79ap39       
+- NZ_CP036461.1   CP036461        39.272  42.473  28      -       -       -       33      5
 Zymomonas mobilis subsp. mobilis ZM4 = ATCC 31821       Bacteria        Pseudomonadota  Alphaproteobacteria     pZZM401
--       CP001881.1      37.066  42.3785 51      -       -       -       53      2
+- CP001881.1      37.066  42.3785 51      -       -       -       53      2
 Zymomonas mobilis subsp. mobilis ZM4 = ATCC 31821       Bacteria        Pseudomonadota  Alphaproteobacteria     pZZM402
--       CP001882.1      33.915  42.2763 30      -       -       -       33      3
+- CP001882.1      33.915  42.2763 30      -       -       -       33      3
 Zymomonas mobilis subsp. mobilis ZM4 = ATCC 31821       Bacteria        Pseudomonadota  Alphaproteobacteria     pZZM403
--       CP001883.1      32.801  43.3036 21      -       -       -       25      4
+- CP001883.1      32.801  43.3036 21      -       -       -       25      4
 
-11.	¿Cómo se podrían hacer los pasos 9 y 10 en un solo paso? Ayuda: haz uso de los operadores lógicos.
+### 11.	¿Cómo se podrían hacer los pasos 9 y 10 en un solo paso? Ayuda: haz uso de los operadores lógicos.
+
+        "El comando & se puede usar para ejecutar varios comandos en una sola línea de código.
 Usando &.
 tail -n8 curso2024/plasmids.txt > curso2024/plasmids_final.txt & head -n4 curso2024/plasmids_final.txt
-12.	En el archivo plasmids.txt, ¿cuántos genomas hay de Klebsiella michiganensis? ¿Y de Pantoea agglomerans? Indica cuántas líneas y cuántos caracteres tiene dicho archivo. 
+
+### 12.	En el archivo plasmids.txt, ¿cuántos genomas hay de Klebsiella michiganensis? ¿Y de Pantoea agglomerans? Indica cuántas líneas y cuántos caracteres tiene dicho archivo.
+
+        El comando "grep" nos permite buscar patrones dentro de un archivo determinado, junto con "-c" podemos contar un patrón específico de un fichero.
 grep -c "Klebsiella michiganensis" curso2024/plasmids.txt
 grep -c " Pantoea agglomerans" curso2024/plasmids.txt
 225 genomas de Klebsiella michiganensis y 148 genomas de Pantoea agglomerans.
 
+        "wc" nos permite contar líneas, carácteres, incluso tamaño de un archivo, con "-m" podemos centrarnos solo en carácteres y con "-l" solo en líneas.
 wc -m curso2024/plasmids.txt
 wc -l curso2024/plasmids.txt
 7566137 caracteres y 59388 líneas.
 
+### 13.	Crear un Shell script de Bash llamado dormir.sh que ejecute el comando sleep durante 500 segundos.
+
+        El comando "echo" nos permite imprimir una línea de texto en un archivo, si imprimimos "sleep 500s" en un archivo ".sh", cuando se ejecute ese script de bash lo que hará será ejecutar el comando "sleep 500s"
+echo sleep 500s > dormir.sh
+
+### 14.	Cambia los permisos del script dormir.sh. Combina la forma de dar/quitar permisos a través del código octal (Ejemplo: 777) y modo archivo (Ejemplo: u+x).
+
+        Se puede quitar y poner servicios para usuarios, grupos de usuarios u otros mediante el comando chmod, chmod funciona con código octal como con el modo archivo.
+•	Quita todos los permisos al archivo.: chmod 000 dormir.sh
+•	Da permiso de lectura, escritura y ejecución a tu usuario.: chmod u+rwx dormir.sh
+•	Da permisos de lectura y escritura a todos los usuarios.: chmod 606 dormir.sh
+•	Da solo permisos de ejecución al grupo de usuarios. chmod g+x dormir.sh
+•	Quita todos los permisos al grupo y a todos. Solo tu usuario es el que debe tener permisos. chmod go-rwx dormir.sh
+
+### 15.	Ejecuta el Shell script en segundo plano. Comprueba que se está ejecutando. ¿Qué identificador tiene asociado? Elimina el proceso en ejecución.
+
+        Podemos ejecutar un script en segundo plano indicando "&" al final, por lo que despues de ejecutar "dormir.sh" tendremos el control sobre la consola
+./dormir.sh &
+
+        "jobs" nos lista los comandos que están activos en este momento, "-l" además nos indica el PID de estos comandos, por lo que podremos trabajar con ellos.
+jobs -l
+Nos da el identificador o pid 1128, tras el comando jobs -l vemos que se está ejecutando en segundo plano.
+
+        "kill" nos permite acabar con los procesos activos indicando su PID.
+Kill 1128
