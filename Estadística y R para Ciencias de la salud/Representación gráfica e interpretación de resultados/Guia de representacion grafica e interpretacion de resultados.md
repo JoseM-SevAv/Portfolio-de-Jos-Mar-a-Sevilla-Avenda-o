@@ -244,4 +244,10 @@ PlotS <- PA + PB + PC + PD + PE + PF + PG + PH + PI + PJ + plot_layout(nrow =4, 
 PlotS
 
 <img src=https://github.com/JoseM-SevAv/Portfolio-de-Jos-Mar-a-Sevilla-Avenda-o/blob/main/images/expresion%20genica.png>
+
+### •	¿Qué interpretación sacas de la distribución de la expresión de los genes cuando los comparamos por tipo de tratamiento? (mínimo 150 palabras de extensión).
+
+#### En los diferentes gráficos observamos que el fármaco disminuye la expresión de los genes problema mientras que el no-tratamiento del paciente o tratamiento con placebo no afecta a sus niveles de expresión génica, de esta forma se mantienen altos. En todos los casos tratados con fármaco podemos ver que la expresión génica está en un mínimo, sin apenas varianza, mientras que en los pacientes tratados con placebo podemos observar una varianza considerable en la expresión, la varianza del placebo se puede explicar por la diferencia de expresión génica entre diversos miembros de la población.
+#### Investigando un poco más podemos ver que la función de los genes problema se relacionan con las funciones de proliferación celular, diferenciación, transcripción, regulación del ciclo celular, etc...
+#### Podría decirse que las funciones están relacionadas principalmente con la proliferación celular, y que el fármaco puede tratarse de algún remedio experimental contra un cáncer, ya que a una parte de la población se le ha administrado placebo.
     
