@@ -242,4 +242,6 @@ PlotS <- PA + PB + PC + PD + PE + PF + PG + PH + PI + PJ + plot_layout(nrow =4, 
     Por último llamamos a la variable PlotS para ver el resultado.
     
 PlotS
+
+<img src=https://github.com/JoseM-SevAv/Portfolio-de-Jos-Mar-a-Sevilla-Avenda-o/blob/main/images/expresion%20genica.png>
     
